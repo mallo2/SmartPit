@@ -1,0 +1,8 @@
+pygame
+python-dotenv
+openai-whisper
+pyirsdk
+sounddevice
+wavio
+numpy
+groq

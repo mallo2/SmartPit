@@ -1,14 +1,11 @@
+import os
 import threading
 import pygame
 import sys
-
 from AudioAI import AudioAI, record_audio, save_audio
 import TextAI as TextAI
 from IRacing import IRacing
-
-
-fanatec_name = "FANATEC Wheel"
-fanatec_buttons = 108
+from dotenv import load_dotenv
 
 
 def init_joystick():
@@ -23,10 +20,11 @@ def init_joystick():
 
 
 def is_fanatec_wheel(joystick):
-    return joystick.get_name() == fanatec_name and joystick.get_numbuttons() == fanatec_buttons
+    return joystick.get_name() == os.getenv("FANATEC_NAME") and joystick.get_numbuttons() == os.getenv("COUNT_BUTTONS")
 
 
 def main():
+    load_dotenv()
     ir = IRacing()
     audioAI = AudioAI()
     textAI = TextAI.TextAI()
@@ -51,8 +49,7 @@ def main():
                     print(informations_requested)
                 elif event.type == pygame.JOYBUTTONDOWN and event.button == 21:
                     ir.gap_ahead_car()
-                    #threading.Thread(target=ir.thread_fuel_consumption).start()
-
+                    # threading.Thread(target=ir.thread_fuel_consumption).start()
 
             pygame.time.wait(100)
 
