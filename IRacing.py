@@ -1,0 +1,162 @@
+from asyncio import sleep
+
+import irsdk
+
+
+class IRacing:
+    def __init__(self):
+        self.ir = irsdk.IRSDK()
+        self.ir.startup()
+
+    def __format_lap_time(self, lap_time: float) -> str:
+        return f"{int(lap_time / 60)}:{lap_time % 60:.3f}"
+
+    def __int_to_pourcentage(self, i: int) -> str:
+        return f"{i}%"
+
+    def __int_to_liters(self, i: int) -> str:
+        return f"{i}L"
+
+    def __idx_of_behind_player(self) -> int:
+        return self.ir['CarIdxPosition'].index(self.my_position() + 1)
+
+    def __idx_of_ahead_player(self) -> int:
+        return self.ir['CarIdxPosition'].index(self.my_position() - 1)
+
+    def __is_hotlap(self) -> bool:
+        return self.ir['SessionTimeRemain'] == -1
+
+    def __is_race_mesured_laps(self) -> bool:
+        return self.ir['SessionTimeTotal'] == 86400.0
+
+    def __is_race_mesured_time(self) -> bool:
+        return self.ir['SessionLapsRemainEx'] == 32767
+
+    def __is_race_over(self) -> bool:
+        return (self.ir['SessionTimeRemain'] == 0 and self.__is_race_mesured_time()) or (
+                self.ir['SessionLapsRemainEx'] == 0 and self.__is_race_mesured_laps())
+
+    def thread_fuel_consumption(self):
+        global repetition, fuel_consumption_by_hour, average_fuel_consumption_by_second
+        repetition = 0
+        fuel_consumption_by_hour = 0
+
+        while not self.__is_race_over():
+            fuel_consumption_by_hour += self.ir['FuelUsePerHour']
+            repetition += 1
+            average_fuel_consumption_by_second = fuel_consumption_by_hour / repetition / 3600
+            sleep(0.1)
+        print("Fin de la course")
+
+    # Ma Position
+    def my_position(self) -> int:
+        return self.ir['PlayerCarPosition']
+
+    # Nombre de tours total dans la course
+    def count_total_laps(self) -> str:
+        if self.__is_race_mesured_laps():
+            return self.ir['SessionLapsTotal']
+        else:
+            return self.duration_race()
+
+    # Nombre de tours restants dans la course
+    def count_remaining_laps(self) -> str:
+        if self.__is_race_mesured_laps():
+            return self.ir['SessionLapsRemainEx']
+        else:
+            return self.duration_remaining()
+
+    # Durée totale de la course
+    def duration_race(self) -> str:
+        if self.__is_race_mesured_time():
+            return self.__format_lap_time(self.ir['SessionTimeTotal'])
+        else:
+            return self.count_total_laps()
+
+    # Durée restante de la course
+    def duration_remaining(self) -> str:
+        if self.__is_race_mesured_time():
+            return self.__format_lap_time(self.ir['SessionTimeRemain'])
+        else:
+            return self.count_remaining_laps()
+
+    # Mon meilleur temps au tour
+    def my_best_lap_time(self) -> str:
+        best_lap_time = self.ir['LapBestLapTime']
+        return self.__format_lap_time(best_lap_time)
+
+    # Mon dernier temps au tour
+    def my_last_lap_time(self) -> str:
+        last_lap_time = self.ir['LapLastLapTime']
+        return self.__format_lap_time(last_lap_time)
+
+    # Mon nombre d'incidents
+    def incident_count(self) -> int:
+        return self.ir['PlayerCarMyIncidentCount']
+
+    # Meilleur temps au tour de la voiture devant
+    def best_lap_time_ahead_car(self) -> str:
+        best_lap_time = self.ir['CarIdxBestLapTime'][self.__idx_of_ahead_player()]
+        return self.__format_lap_time(best_lap_time)
+
+    # Dernier temps au tour de la voiture devant
+    def last_lap_time_ahead_car(self) -> str:
+        last_lap_time = self.ir['CarIdxLastLapTime'][self.__idx_of_ahead_player()]
+        return self.__format_lap_time(last_lap_time)
+
+    # Meilleur temps au tour de la voiture derrière
+    def best_lap_time_behind_car(self) -> str:
+        best_lap_time = self.ir['CarIdxBestLapTime'][self.__idx_of_behind_player()]
+        return self.__format_lap_time(best_lap_time)
+
+    # Dernier temps au tour de la voiture derrière
+    def last_lap_time_behind_car(self) -> str:
+        last_lap_time = self.ir['CarIdxBestLapTime'][self.__idx_of_behind_player()]
+        return self.__format_lap_time(last_lap_time)
+
+    # Autorisation des pneus pluie
+    def declared_wet(self) -> bool:
+        return self.ir['WeatherDeclaredWet'] == 1
+
+    # Pourcentage de l'humidité
+    def pourcentage_humidity(self) -> str:
+        return self.__int_to_pourcentage(self.ir['RelativeHumidity'])
+
+    # Pourcentage de précipitation
+    def pourcentage_precipation(self) -> str:
+        return self.__int_to_pourcentage(self.ir['Precipitation'])
+
+    # Litres de carburant restant
+    def remaining_litres_of_fuel(self) -> str:
+        return self.__int_to_liters(self.ir['FuelLevel'])
+
+    # Pourcentage de carburant restant
+    def remaining_pourcentage_of_fuel(self) -> str:
+        return self.__int_to_pourcentage(self.ir['FuelLevelPct'])
+
+    # Carburant manquant pour finir la course
+    def get_fuel_necessary(self) -> str:
+        if average_fuel_consumption_by_second:
+            return "Le calculateur n'a pas été démarré"
+        fuel_necessary = 0
+        if self.__is_race_mesured_laps():
+            fuel_necessary = self.count_remaining_laps() * self.ir[
+                'LapLastLapTime'] * average_fuel_consumption_by_second - self.ir['FuelLevel']
+        elif self.__is_race_mesured_time():
+            fuel_necessary = self.ir['SessionTimeRemain'] * average_fuel_consumption_by_second - self.ir['FuelLevel']
+
+        if fuel_necessary < 0:
+            return "Vous avez assez de carburant"
+        else:
+            return f"Il manque {fuel_necessary}L de carburant pour finir la course."
+
+    # TODO : Calculer le GAP avec la voiture devant
+    def gap_ahead_car(self):
+        est_lap_time = self.ir['CarIdxEstTime']
+        print(est_lap_time[self.__idx_of_ahead_player()] - est_lap_time[self.my_position()])
+
+    # TODO : Calculer le GAP avec la voiture derrière
+
+    # TODO : PIT
+
+    # TODO : PNEUS
