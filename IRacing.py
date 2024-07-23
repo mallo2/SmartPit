@@ -1,6 +1,7 @@
 from asyncio import sleep
 
 import irsdk
+import numpy as np
 
 
 class IRacing:
@@ -23,6 +24,47 @@ class IRacing:
     def __idx_of_ahead_player(self) -> int:
         return self.ir['CarIdxPosition'].index(self.my_position() - 1)
 
+    def __idx_of_ahead_car(self):
+        closest_car_idx = -1
+        min_distance_diff = float('inf')
+        for idx, distance in enumerate(self.ir["CarIdxLapDistPct"]):
+            if idx == -1 or distance == -1 or idx == self.ir["PlayerCarIdx"]:
+                continue
+            if distance < self.ir["CarIdxLapDistPct"][self.ir["PlayerCarIdx"]]:
+                continue
+
+            distance_diff = abs(self.ir["CarIdxLapDistPct"][self.ir["PlayerCarIdx"]] - distance)
+
+            if distance_diff > 0.5:
+                continue
+
+            if distance_diff < min_distance_diff:
+                min_distance_diff = distance_diff
+                closest_car_idx = idx
+
+        return closest_car_idx
+
+    def __idx_of_behind_car(self):
+        closest_car_idx = -1
+        min_distance_diff = float('inf')
+        for idx, distance in enumerate(self.ir["CarIdxLapDistPct"]):
+            if idx == -1 or distance == -1 or idx == self.ir["PlayerCarIdx"]:
+                continue
+
+            distance_diff = abs(self.ir["CarIdxLapDistPct"][self.ir["PlayerCarIdx"]] - distance)
+
+            if distance_diff < 0.5 and distance > self.ir["CarIdxLapDistPct"][self.ir["PlayerCarIdx"]]:
+                continue
+
+            if distance_diff > 0.5:
+                distance_diff = abs(1 - distance_diff)
+
+            if distance_diff < min_distance_diff:
+                min_distance_diff = distance_diff
+                closest_car_idx = idx
+
+        return closest_car_idx
+
     def __is_hotlap(self) -> bool:
         return self.ir['SessionTimeRemain'] == -1
 
@@ -35,6 +77,13 @@ class IRacing:
     def __is_race_over(self) -> bool:
         return (self.ir['SessionTimeRemain'] == 0 and self.__is_race_mesured_time()) or (
                 self.ir['SessionLapsRemainEx'] == 0 and self.__is_race_mesured_laps())
+
+    def __best_session_lap_time(self):
+        min_lap_time = float('inf')
+        for lap_time in self.ir["CarIdxBestLapTime"]:
+            if lap_time < min_lap_time and lap_time != -1:
+                min_lap_time = lap_time
+        return min_lap_time
 
     def thread_fuel_consumption(self):
         global repetition, fuel_consumption_by_hour, average_fuel_consumption_by_second
@@ -94,6 +143,10 @@ class IRacing:
     def incident_count(self) -> int:
         return self.ir['PlayerCarMyIncidentCount']
 
+    # Meilleur tour de la session
+    def best_session_lap_time(self) -> str:
+        return self.__format_lap_time(self.__best_session_lap_time())
+
     # Meilleur temps au tour de la voiture devant
     def best_lap_time_ahead_car(self) -> str:
         best_lap_time = self.ir['CarIdxBestLapTime'][self.__idx_of_ahead_player()]
@@ -150,12 +203,31 @@ class IRacing:
         else:
             return f"Il manque {fuel_necessary}L de carburant pour finir la course."
 
-    # TODO : Calculer le GAP avec la voiture devant
-    def gap_ahead_car(self):
-        est_lap_time = self.ir['CarIdxEstTime']
-        print(est_lap_time[self.__idx_of_ahead_player()] - est_lap_time[self.my_position()])
+    # Ecart avec la voiture devant
+    def gap_with_front_car(self):
+        player_est_time = self.ir["CarIdxEstTime"][self.ir["PlayerCarIdx"]]
+        car_idx = self.get_behind_car_idx()
+        if car_idx == -1:
+            return "Aucune voiture devant vous"
+        car_est_time = self.ir["CarIdxEstTime"][car_idx]
 
-    # TODO : Calculer le GAP avec la voiture derrière
+        relative_time = car_est_time - player_est_time
+        return self.__format_lap_time(relative_time)
+
+    # Ecart avec la voiture derriere
+    def gap_with_behind_car(self):
+        player_est_time = self.ir["CarIdxEstTime"][self.ir["PlayerCarIdx"]]
+        car_idx = self.get_behind_car_idx()
+        if car_idx == -1:
+            print("Aucune voiture derrière vous")
+            return
+        car_est_time = self.ir["CarIdxEstTime"][car_idx]
+        if car_est_time < player_est_time:
+            relative_time = player_est_time - car_est_time
+        else:
+            relative_time = self.__best_session_lap_time() - car_est_time
+
+        return self.__format_lap_time(relative_time - 1.5)
 
     # TODO : PIT
 
