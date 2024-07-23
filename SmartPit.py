@@ -1,3 +1,4 @@
+import os
 import threading
 import pygame
 import sys
@@ -6,6 +7,8 @@ from AudioAI import AudioAI, record_audio, save_audio
 import TextAI as TextAI
 from IRacing import IRacing
 from dotenv import load_dotenv
+
+from UI import UI
 
 
 def init_joystick():
@@ -19,17 +22,18 @@ def init_joystick():
     return joystick
 
 
-def is_fanatec_wheel(joystick):
+def is_good_wheel(joystick):
     return joystick.get_name() == os.getenv("FANATEC_NAME") and joystick.get_numbuttons() == os.getenv("COUNT_BUTTONS")
 
 
 def main():
+    ui = UI()
     load_dotenv()
     ir = IRacing()
-    audioAI = AudioAI()
-    textAI = TextAI.TextAI()
+    audio_AI = AudioAI()
+    text_AI = TextAI.TextAI()
     joystick = init_joystick()
-    if is_fanatec_wheel(joystick):
+    if is_good_wheel(joystick):
         is_recording = False
         recording_data = []
 
@@ -45,7 +49,7 @@ def main():
                     stream.close()
                     is_recording = False
                     save_audio(recording_data)
-                    informations_requested = textAI.process_request(audioAI=audioAI)
+                    informations_requested = text_AI.process_request(audioAI=audio_AI)
                     print(informations_requested)
                 elif event.type == pygame.JOYBUTTONDOWN and event.button == 21:
                     ir.gap_with_car()

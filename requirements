@@ -6,3 +6,4 @@ sounddevice
 wavio
 numpy
 groq
+customtkinter

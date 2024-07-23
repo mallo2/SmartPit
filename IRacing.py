@@ -1,7 +1,6 @@
 from asyncio import sleep
 
 import irsdk
-import numpy as np
 
 
 class IRacing:
@@ -206,7 +205,7 @@ class IRacing:
     # Ecart avec la voiture devant
     def gap_with_front_car(self):
         player_est_time = self.ir["CarIdxEstTime"][self.ir["PlayerCarIdx"]]
-        car_idx = self.get_behind_car_idx()
+        car_idx = self.__idx_of_ahead_car()
         if car_idx == -1:
             return "Aucune voiture devant vous"
         car_est_time = self.ir["CarIdxEstTime"][car_idx]
@@ -217,10 +216,9 @@ class IRacing:
     # Ecart avec la voiture derriere
     def gap_with_behind_car(self):
         player_est_time = self.ir["CarIdxEstTime"][self.ir["PlayerCarIdx"]]
-        car_idx = self.get_behind_car_idx()
+        car_idx = self.__idx_of_behind_car()
         if car_idx == -1:
-            print("Aucune voiture derrière vous")
-            return
+            return "Aucune voiture derrière vous"
         car_est_time = self.ir["CarIdxEstTime"][car_idx]
         if car_est_time < player_est_time:
             relative_time = player_est_time - car_est_time
