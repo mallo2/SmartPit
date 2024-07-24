@@ -50,8 +50,7 @@ def main():
                     informations_requested = textAI.process_request(audioAI=audioAI)
                     print(informations_requested)
                 elif event.type == pygame.JOYBUTTONDOWN and event.button == 21:
-                    ir.gap_with_car()
-                    #threading.Thread(target=ir.thread_fuel_consumption).start()
+                    threading.Thread(target=ir.thread_fuel_consumption).start()
 
 
             pygame.time.wait(100)
