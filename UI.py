@@ -1,6 +1,6 @@
 from PIL import Image
-
 import customtkinter as ctk
+
 
 class UI:
     def __init__(self):
@@ -37,4 +37,3 @@ class UI:
         # Action à réaliser lors du clic sur le bouton
         print(f"API Key: {self.textbox.get()}")
         print(f"Option sélectionnée: {self.dropdown.get()}")
-

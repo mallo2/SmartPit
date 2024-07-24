@@ -227,43 +227,97 @@ class IRacing:
 
         return self.__format_lap_time(relative_time - 1.5)
 
+    # Demande de pneus pluie
     def get_wet_tires(self):
         return self.ir.pit_command(irsdk.PitCommandMode.type_tires, 1)
 
+    # Demande de pneus sec
     def get_dry_tires(self):
         return self.ir.pit_command(irsdk.PitCommandMode.type_tires, 0)
 
+    # Ajout de carburant
     def add_fuel(self, fuel_quantity: int):
         return self.ir.pit_command(irsdk.PitCommandMode.fuel, fuel_quantity)
 
-    def change_tire_left_front(self):
+    # Changement du pneu avant gauche
+    def change_front_left_tire(self):
         return self.ir.pit_command(irsdk.PitCommandMode.lf)
 
-    def change_tire_left_rear(self):
+    # Changement du pneu arrière gauche
+    def change_rear_left_tire(self):
         return self.ir.pit_command(irsdk.PitCommandMode.lr)
 
-    def change_tire_right_front(self):
+    # Changement du pneu avant droit
+    def change_front_right_tire(self):
         return self.ir.pit_command(irsdk.PitCommandMode.rf)
 
-    def change_tire_right_rear(self):
+    # Changement du pneu arrière droit
+    def change_rear_right_tire(self):
         return self.ir.pit_command(irsdk.PitCommandMode.rr)
 
-    # TODO : PNEUS
-
-    def get_count_set_tires_available(self):
+    # Nombre de sets de pneus disponibles
+    def count_sets_of_tires(self):
         count = self.ir['TireSetsAvailable']
-        if count == 255 or None:
+        if count == 255 or count is None:
             return "Infini"
         return count
 
-    def get_set_right_front_tire_available(self):
+    # Nombre de sets du pneu avant droit disponibles
+    def count_sets_of_front_right_tire(self):
         count = self.ir['RFTiresAvailable']
-        if count == 255 or None:
+        if count == 255 or count is None:
             return "Infini"
         return count
 
-    def get_temp_right_front_tire(self):
+    # Température du pneu avant droit
+    def temperature_of_front_right_tire(self):
         return (self.ir['RFtempCL'] + self.ir['RFtempCM'] + self.ir['RFtempCR']) / 3
 
-    def get_remaining_right_front_tire(self):
+    # Pourcentage restant du pneu avant droit
+    def remaining_percentage_of_front_right_tire(self):
         return (self.ir['RFwearL'] + self.ir['RFwearM'] + self.ir['RFwearR']) / 3
+
+    # Nombre de sets du pneu arrière droit disponibles
+    def count_sets_of_rear_right_tire(self):
+        count = self.ir['RRTiresAvailable']
+        if count == 255 or count is None:
+            return "Infini"
+        return count
+
+    # Température du pneu arrière droit
+    def temperature_of_rear_right_tire(self):
+        return (self.ir['RRtempCL'] + self.ir['RRtempCM'] + self.ir['RRtempCR']) / 3
+
+    # Pourcentage restant du pneu arrière droit
+    def remaining_percentage_of_rear_right_tire(self):
+        return (self.ir['RRwearL'] + self.ir['RRwearM'] + self.ir['RRwearR']) / 3
+
+    # Nombre de sets du pneu avant gauche disponibles
+    def count_sets_of_front_left_tire(self):
+        count = self.ir['LFTiresAvailable']
+        if count == 255 or count is None:
+            return "Infini"
+        return count
+
+    # Température du pneu avant gauche
+    def temperature_of_front_left_tire(self):
+        return (self.ir['LFtempCL'] + self.ir['LFtempCM'] + self.ir['LFtempCR']) / 3
+
+    # Pourcentage restant du pneu avant gauche
+    def remaining_percentage_of_front_left_tire(self):
+        return (self.ir['LFwearL'] + self.ir['LFwearM'] + self.ir['LFwearR']) / 3
+
+    # Nombre de sets du pneu arrière gauche disponibles
+    def count_sets_of_rear_left_tire(self):
+        count = self.ir['LRTiresAvailable']
+        if count == 255 or count is None:
+            return "Infini"
+        return count
+
+    # Température du pneu arrière gauche
+    def temperature_of_rear_left_tire(self):
+        return (self.ir['LRtempCL'] + self.ir['LRtempCM'] + self.ir['LRtempCR']) / 3
+
+    # Pourcentage restant du pneu arrière gauche
+    def remaining_percentage_of_rear_left_tire(self):
+        return (self.ir['LRwearL'] + self.ir['LRwearM'] + self.ir['LRwearR']) / 3
