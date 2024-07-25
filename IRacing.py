@@ -1,21 +1,23 @@
 from asyncio import sleep
-
 import irsdk
+
+
+def format_lap_time(lap_time: float) -> str:
+    return f"{int(lap_time / 60)}:{lap_time % 60:.3f}"
+
+
+def int_to_pourcentage(i: int) -> str:
+    return f"{i}%"
+
+
+def int_to_liters(i: int) -> str:
+    return f"{i}L"
 
 
 class IRacing:
     def __init__(self):
         self.ir = irsdk.IRSDK()
         self.ir.startup()
-
-    def __format_lap_time(self, lap_time: float) -> str:
-        return f"{int(lap_time / 60)}:{lap_time % 60:.3f}"
-
-    def __int_to_pourcentage(self, i: int) -> str:
-        return f"{i}%"
-
-    def __int_to_liters(self, i: int) -> str:
-        return f"{i}L"
 
     def __idx_of_behind_player(self) -> int:
         return self.ir['CarIdxPosition'].index(self.my_position() + 1)
@@ -117,26 +119,26 @@ class IRacing:
     # Durée totale de la course
     def duration_race(self) -> str:
         if self.__is_race_mesured_time():
-            return self.__format_lap_time(self.ir['SessionTimeTotal'])
+            return format_lap_time(self.ir['SessionTimeTotal'])
         else:
             return self.count_total_laps()
 
     # Durée restante de la course
     def duration_remaining(self) -> str:
         if self.__is_race_mesured_time():
-            return self.__format_lap_time(self.ir['SessionTimeRemain'])
+            return format_lap_time(self.ir['SessionTimeRemain'])
         else:
             return self.count_remaining_laps()
 
     # Mon meilleur temps au tour
     def my_best_lap_time(self) -> str:
         best_lap_time = self.ir['LapBestLapTime']
-        return self.__format_lap_time(best_lap_time)
+        return format_lap_time(best_lap_time)
 
     # Mon dernier temps au tour
     def my_last_lap_time(self) -> str:
         last_lap_time = self.ir['LapLastLapTime']
-        return self.__format_lap_time(last_lap_time)
+        return format_lap_time(last_lap_time)
 
     # Mon nombre d'incidents
     def incident_count(self) -> int:
@@ -144,27 +146,27 @@ class IRacing:
 
     # Meilleur tour de la session
     def best_session_lap_time(self) -> str:
-        return self.__format_lap_time(self.__best_session_lap_time())
+        return format_lap_time(self.__best_session_lap_time())
 
     # Meilleur temps au tour de la voiture devant
     def best_lap_time_ahead_car(self) -> str:
         best_lap_time = self.ir['CarIdxBestLapTime'][self.__idx_of_ahead_player()]
-        return self.__format_lap_time(best_lap_time)
+        return format_lap_time(best_lap_time)
 
     # Dernier temps au tour de la voiture devant
     def last_lap_time_ahead_car(self) -> str:
         last_lap_time = self.ir['CarIdxLastLapTime'][self.__idx_of_ahead_player()]
-        return self.__format_lap_time(last_lap_time)
+        return format_lap_time(last_lap_time)
 
     # Meilleur temps au tour de la voiture derrière
     def best_lap_time_behind_car(self) -> str:
         best_lap_time = self.ir['CarIdxBestLapTime'][self.__idx_of_behind_player()]
-        return self.__format_lap_time(best_lap_time)
+        return format_lap_time(best_lap_time)
 
     # Dernier temps au tour de la voiture derrière
     def last_lap_time_behind_car(self) -> str:
         last_lap_time = self.ir['CarIdxBestLapTime'][self.__idx_of_behind_player()]
-        return self.__format_lap_time(last_lap_time)
+        return format_lap_time(last_lap_time)
 
     # Autorisation des pneus pluie
     def declared_wet(self) -> bool:
@@ -172,19 +174,19 @@ class IRacing:
 
     # Pourcentage de l'humidité
     def pourcentage_humidity(self) -> str:
-        return self.__int_to_pourcentage(self.ir['RelativeHumidity'])
+        return int_to_pourcentage(self.ir['RelativeHumidity'])
 
     # Pourcentage de précipitation
     def pourcentage_precipation(self) -> str:
-        return self.__int_to_pourcentage(self.ir['Precipitation'])
+        return int_to_pourcentage(self.ir['Precipitation'])
 
     # Litres de carburant restant
     def remaining_litres_of_fuel(self) -> str:
-        return self.__int_to_liters(self.ir['FuelLevel'])
+        return int_to_liters(self.ir['FuelLevel'])
 
     # Pourcentage de carburant restant
     def remaining_pourcentage_of_fuel(self) -> str:
-        return self.__int_to_pourcentage(self.ir['FuelLevelPct'])
+        return int_to_pourcentage(self.ir['FuelLevelPct'])
 
     # Carburant manquant pour finir la course
     def get_fuel_necessary(self) -> str:
@@ -211,7 +213,7 @@ class IRacing:
         car_est_time = self.ir["CarIdxEstTime"][car_idx]
 
         relative_time = car_est_time - player_est_time
-        return self.__format_lap_time(relative_time)
+        return format_lap_time(relative_time)
 
     # Ecart avec la voiture derriere
     def gap_with_behind_car(self):
@@ -225,7 +227,7 @@ class IRacing:
         else:
             relative_time = self.__best_session_lap_time() - car_est_time
 
-        return self.__format_lap_time(relative_time - 1.5)
+        return format_lap_time(relative_time - 1.5)
 
     # Demande de pneus pluie
     def get_wet_tires(self):

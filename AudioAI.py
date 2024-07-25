@@ -1,8 +1,10 @@
 import os
+import pygame
 import sounddevice as sd
 import wavio
 import numpy as np
 import whisper
+from dotenv import get_key
 
 
 def delete_file_if_exists(filename):
@@ -12,7 +14,7 @@ def delete_file_if_exists(filename):
 
 def save_audio(recording_data, sample_rate=44100):
     audio_array = np.concatenate(recording_data, axis=0)
-    wavio.write(os.getenv("FILENAME_RECORD"), audio_array, sample_rate, sampwidth=2)
+    wavio.write(get_key('.env', 'FILENAME_RECORD'), audio_array, sample_rate, sampwidth=2)
 
 
 def record_audio(recording_data: list, sample_rate=44100):
@@ -24,13 +26,22 @@ def record_audio(recording_data: list, sample_rate=44100):
     return stream
 
 
+def play_welcome_sound():
+    pygame.mixer.init()
+    pygame.mixer.music.load("ressources/sounds/welcome_message.mp3")
+    pygame.mixer.music.play()
+
+    while pygame.mixer.music.get_busy():
+        pygame.time.Clock().tick(10)
+
+
 class AudioAI:
 
     def __init__(self):
-        self.model = whisper.load_model(os.getenv("WHISPER_MODEL"))
+        self.model = whisper.load_model(get_key('.env', 'WHISPER_MODEL'))
 
     def transcribe_audio(self) -> str:
-        audio_file = os.getenv("FILENAME_RECORD")
+        audio_file = get_key('.env', 'FILENAME_RECORD')
         result = self.model.transcribe(audio_file)
-        delete_file_if_exists(os.getenv("FILENAME_RECORD"))
+        delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
         return result["text"]
