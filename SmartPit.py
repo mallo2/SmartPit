@@ -10,7 +10,6 @@ from Device import is_good_device, init_device, get_devices_name
 
 def launch_application():
     play_welcome_sound()
-    print("Lancement de l'application")
     ir = IRacing()
     audio_AI = AudioAI()
     text_AI = TextAI.TextAI()

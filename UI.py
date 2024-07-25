@@ -16,7 +16,7 @@ def init_textbox(textbox):
 
 def change_order_devices(devices):
     selected_device = get_key('.env', 'SELECTED_DEVICE')
-    if selected_device and selected_device != "":
+    if selected_device and selected_device != "" and selected_device in devices:
         devices.remove(selected_device)
         devices.insert(0, selected_device)
 
