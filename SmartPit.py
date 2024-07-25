@@ -1,4 +1,5 @@
 import os
+import sys
 import threading
 import re
 import pygame
@@ -9,9 +10,24 @@ from IRacing import IRacing
 from customtkinter import CTk
 from UI import UI
 
+
 def delete_file_if_exists(filename):
     if os.path.exists(filename):
         os.remove(filename)
+
+
+def get_devices_name():
+    names = []
+    pygame.init()
+    pygame.joystick.init()
+    if pygame.joystick.get_count() == 0:
+        print("Aucun périphérique de jeu connecté.")
+        sys.exit()
+    for i in range(pygame.joystick.get_count()):
+        joystick = pygame.joystick.Joystick(i)
+        joystick.init()
+        names.append(joystick.get_name())
+    return names
 
 
 def process(text_AI: TextAI.TextAI, audio_AI: AudioAI, ir: IRacing):
@@ -61,9 +77,7 @@ def launch_application():
 class SmartPit(CTk):
     def __init__(self):
         super().__init__()
-        pygame.init()
-        pygame.joystick.init()
-        UI(self, ["G29", "G920", "G27", "G25", "G923", "G923_PS5", "G923_XBOX"])
+        UI(self, get_devices_name())
 
 
 if __name__ == "__main__":
