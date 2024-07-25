@@ -1,15 +1,9 @@
-import os
 import pygame
 import sounddevice as sd
 import wavio
 import numpy as np
 import whisper
 from dotenv import get_key
-
-
-def delete_file_if_exists(filename):
-    if os.path.exists(filename):
-        os.remove(filename)
 
 
 def save_audio(recording_data, sample_rate=44100):
@@ -43,5 +37,5 @@ class AudioAI:
     def transcribe_audio(self) -> str:
         audio_file = get_key('.env', 'FILENAME_RECORD')
         result = self.model.transcribe(audio_file)
-        delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
+
         return result["text"]

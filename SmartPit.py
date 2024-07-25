@@ -1,11 +1,35 @@
+import os
 import threading
+import re
 import pygame
+from dotenv import get_key
 from AudioAI import AudioAI, record_audio, save_audio, play_welcome_sound
 import TextAI as TextAI
 from IRacing import IRacing
 from customtkinter import CTk
 from UI import UI
 from Device import is_good_device, init_device, get_devices_name
+
+
+def delete_file_if_exists(filename):
+    if os.path.exists(filename):
+        os.remove(filename)
+
+
+def process(text_AI: TextAI.TextAI, audio_AI: AudioAI, ir: IRacing):
+    informations_requested = text_AI.process_request(audioAI=audio_AI)
+    match = re.match(r"(\w+)\((.*)\)", informations_requested)
+    if match:
+        method_name = match.group(1)
+        args = match.group(2)
+        arg_values = [eval(arg.strip()) for arg in args.split(',')]
+        method = getattr(ir, method_name)
+        data_result = method(*arg_values)
+        delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
+        return data_result
+    else:
+        print("Format de chaîne invalide")
+        process(text_AI=text_AI, audio_AI=audio_AI, ir=ir)
 
 
 def launch_application():
@@ -30,8 +54,8 @@ def launch_application():
                     stream.close()
                     is_recording = False
                     save_audio(recording_data)
-                    informations_requested = text_AI.process_request(audioAI=audio_AI)
-                    print(informations_requested)
+                    data_result = process(text_AI=text_AI, audio_AI=audio_AI, ir=ir)
+                    print(data_result)
                 elif event.type == pygame.JOYBUTTONDOWN and event.button == 21:
                     threading.Thread(target=ir.thread_fuel_consumption).start()
 
