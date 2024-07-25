@@ -1,37 +1,11 @@
-import os
 import threading
 import pygame
-import sys
 from AudioAI import AudioAI, record_audio, save_audio, play_welcome_sound
 import TextAI as TextAI
 from IRacing import IRacing
 from customtkinter import CTk
 from UI import UI
-
-
-def is_good_wheel(joystick):
-    return joystick.get_name() == os.getenv("DEVICE_NAME") and joystick.get_numbuttons() == os.getenv(
-        "COUNT_BUTTONS")
-
-
-def get_joysticks_name():
-    names = []
-    pygame.init()
-    pygame.joystick.init()
-    if pygame.joystick.get_count() == 0:
-        print("Aucun périphérique de jeu connecté.")
-        sys.exit()
-    for i in range(pygame.joystick.get_count()):
-        joystick = pygame.joystick.Joystick(i)
-        joystick.init()
-        names.append(joystick.get_name())
-    return names
-
-
-def init_joystick():
-    joystick = pygame.joystick.Joystick(pygame.joystick.get_count() - 1)
-    joystick.init()
-    return joystick
+from Device import is_good_device, init_device, get_devices_name
 
 
 def launch_application():
@@ -40,8 +14,8 @@ def launch_application():
     ir = IRacing()
     audio_AI = AudioAI()
     text_AI = TextAI.TextAI()
-    joystick = init_joystick()
-    if is_good_wheel(joystick):
+    joystick = init_device()
+    if is_good_device(joystick):
         is_recording = False
         recording_data = []
 
@@ -68,7 +42,7 @@ def launch_application():
 class SmartPit(CTk):
     def __init__(self):
         super().__init__()
-        UI(self, ["Fanatec", "Logitech", "Thrustmaster"])
+        UI(self, get_devices_name())
 
 
 if __name__ == "__main__":
