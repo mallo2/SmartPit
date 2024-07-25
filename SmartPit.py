@@ -8,8 +8,6 @@ import TextAI as TextAI
 from IRacing import IRacing
 from customtkinter import CTk
 from UI import UI
-from Device import is_good_device, init_device, get_devices_name
-
 
 def delete_file_if_exists(filename):
     if os.path.exists(filename):
@@ -37,35 +35,35 @@ def launch_application():
     ir = IRacing()
     audio_AI = AudioAI()
     text_AI = TextAI.TextAI()
-    joystick = init_device()
-    if is_good_device(joystick):
-        is_recording = False
-        recording_data = []
+    is_recording = False
+    recording_data = []
 
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.JOYBUTTONDOWN and event.button == 1 and not is_recording:
-                    print("Début de l'enregistrement")
-                    recording_data = []
-                    stream = record_audio(recording_data)
-                    is_recording = True
-                elif event.type == pygame.JOYBUTTONUP and event.button == 1 and is_recording:
-                    stream.stop()
-                    stream.close()
-                    is_recording = False
-                    save_audio(recording_data)
-                    data_result = process(text_AI=text_AI, audio_AI=audio_AI, ir=ir)
-                    print(data_result)
-                elif event.type == pygame.JOYBUTTONDOWN and event.button == 21:
-                    threading.Thread(target=ir.thread_fuel_consumption).start()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.JOYBUTTONDOWN and event.button == 1 and not is_recording:
+                print("Début de l'enregistrement")
+                recording_data = []
+                stream = record_audio(recording_data)
+                is_recording = True
+            elif event.type == pygame.JOYBUTTONUP and event.button == 1 and is_recording:
+                stream.stop()
+                stream.close()
+                is_recording = False
+                save_audio(recording_data)
+                data_result = process(text_AI=text_AI, audio_AI=audio_AI, ir=ir)
+                print(data_result)
+            elif event.type == pygame.JOYBUTTONDOWN and event.button == 21:
+                threading.Thread(target=ir.thread_fuel_consumption).start()
 
-                pygame.time.wait(100)
+            pygame.time.wait(100)
 
 
 class SmartPit(CTk):
     def __init__(self):
         super().__init__()
-        UI(self, get_devices_name())
+        pygame.init()
+        pygame.joystick.init()
+        UI(self, ["G29", "G920", "G27", "G25", "G923", "G923_PS5", "G923_XBOX"])
 
 
 if __name__ == "__main__":
