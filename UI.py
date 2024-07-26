@@ -6,9 +6,11 @@ from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkEntry, CTkComboBox, C
 from dotenv import set_key, get_key
 
 
-def update_env_file(api_key, selected_device):
+def update_env_file(api_key, selected_device, main_button, second_button):
     set_key('.env', 'GROQ_API_KEY', api_key)
     set_key('.env', 'SELECTED_DEVICE', selected_device)
+    set_key('.env', 'MAIN_BUTTON', main_button)
+    set_key('.env', 'SECOND_BUTTON', second_button)
 
 
 def init_textbox(textbox):
@@ -46,12 +48,12 @@ class UI:
         self.alert = self.create_alert()
 
     def clicked(self):
-        print("Démarrer")
         from SmartPit import launch_application
         if self.is_valid_form():
-            update_env_file(self.textbox.get(), self.dropdown.get())
+            update_env_file(self.textbox.get(), self.dropdown.get(), self.main_button.get(), self.second_button.get())
+            idx = self.devices.index(self.dropdown.get())
             self.main.destroy()
-            launch_application()
+            launch_application(idx)
 
     def create_frame(self):
         frame = CTkFrame(master=self.main, fg_color="#001a35")
@@ -72,22 +74,27 @@ class UI:
         return textbox
 
     def create_dropdown(self, devices):
-        change_order_devices(devices)
-        dropdown = CTkComboBox(self.frame, values=devices, state="readonly")
-        dropdown.set(devices[0])
+        devices_copy = devices.copy()
+        change_order_devices(devices_copy)
+        dropdown = CTkComboBox(self.frame, values=devices_copy, state="readonly", width=300)
+        dropdown.set(devices_copy[0])
         dropdown.pack(pady=20)
         return dropdown
 
     def create_button_textbox_frame(self, text):
         frame = CTkFrame(master=self.frame, fg_color="#001a35")
         frame.pack(pady=5)
-
-        capture_textbox = CTkEntry(frame, height=30, width=50, state="readonly")
+        capture_textbox = CTkEntry(frame, height=30, width=50)
         capture_textbox.pack(side="left")
+
         if text == "Assigner la touche principale ":
+            capture_textbox.insert(0, get_key('.env', 'MAIN_BUTTON'))
             main_button = CTkButton(frame, text=text, command=self.detect_key_main)
         else:
+            capture_textbox.insert(0, get_key('.env', 'SECOND_BUTTON'))
             main_button = CTkButton(frame, text=text, command=self.detect_key_second)
+
+        capture_textbox.configure(state="readonly")
         main_button.pack(side="left", padx=5)
 
         return capture_textbox
@@ -121,30 +128,36 @@ class UI:
     def detect_key_main(self):
         self.dropdown.configure(state="disabled")
         start_time = time.time()
+        joystick = pygame.joystick.Joystick(2)
+        joystick.init()
         while True:
-            print("tesr")
             if time.time() - start_time > 7.5:
                 break
             for event in pygame.event.get():
                 if event.type == pygame.JOYBUTTONDOWN:
-                    print(event.button)
                     self.main_button.delete(0, "end")
-                    self.main_button.insert(0, event.button)
+                    self.main_button.configure(state="normal")
+                    self.main_button.insert(0, f"{event.button}")
+                    self.main_button.configure(state="readonly")
                     return
             pygame.time.wait(100)
         self.dropdown.configure(state="normal")
 
     def detect_key_second(self):
         self.dropdown.configure(state="disabled")
-        print("Assigner la touche secondaire")
+        start_time = time.time()
+        # TODO: change the index of the joystick
+        joystick = pygame.joystick.Joystick(2)
+        joystick.init()
         while True:
+            if time.time() - start_time > 7.5:
+                break
             for event in pygame.event.get():
                 if event.type == pygame.JOYBUTTONDOWN:
-                    print(event.button)
                     self.second_button.delete(0, "end")
-                    self.second_button.insert(0, event.button)
+                    self.second_button.configure(state="normal")
+                    self.second_button.insert(0, f"{event.button}")
+                    self.second_button.configure(state="readonly")
                     return
-
-
-
-
+            pygame.time.wait(100)
+        self.dropdown.configure(state="normal")
