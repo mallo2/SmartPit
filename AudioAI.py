@@ -25,9 +25,6 @@ def play_welcome_sound():
     pygame.mixer.music.load("ressources/sounds/welcome_message.mp3")
     pygame.mixer.music.play()
 
-    while pygame.mixer.music.get_busy():
-        pygame.time.Clock().tick(10)
-
 
 class AudioAI:
 
@@ -37,5 +34,4 @@ class AudioAI:
     def transcribe_audio(self) -> str:
         audio_file = get_key('.env', 'FILENAME_RECORD')
         result = self.model.transcribe(audio_file)
-
         return result["text"]
