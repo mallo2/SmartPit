@@ -1,4 +1,5 @@
 import time
+from functools import partial
 
 import pygame
 from PIL import Image
@@ -32,7 +33,6 @@ def init_main(main):
     main.resizable(False, False)
     main.iconbitmap('ressources/images/favicon.ico')
     return main
-
 
 class UI:
     def __init__(self, main, devices):
@@ -89,13 +89,13 @@ class UI:
 
         if text == "Assigner la touche principale ":
             capture_textbox.insert(0, get_key('.env', 'MAIN_BUTTON'))
-            main_button = CTkButton(frame, text=text, command=self.detect_key_main)
+            button = CTkButton(frame, text=text, command=partial(self.detect_key, True))
         else:
             capture_textbox.insert(0, get_key('.env', 'SECOND_BUTTON'))
-            main_button = CTkButton(frame, text=text, command=self.detect_key_second)
+            button = CTkButton(frame, text=text, command=partial(self.detect_key, False))
 
         capture_textbox.configure(state="readonly")
-        main_button.pack(side="left", padx=5)
+        button.pack(side="left", padx=5)
 
         return capture_textbox
 
@@ -125,39 +125,33 @@ class UI:
 
         return valid
 
-    def detect_key_main(self):
+    def detect_key(self, is_main_button):
         self.dropdown.configure(state="disabled")
         start_time = time.time()
-        joystick = pygame.joystick.Joystick(2)
+        joystick = pygame.joystick.Joystick(self.get_idx_device_selected())
         joystick.init()
         while True:
             if time.time() - start_time > 7.5:
                 break
-            for event in pygame.event.get():
-                if event.type == pygame.JOYBUTTONDOWN:
-                    self.main_button.configure(state="normal")
-                    self.main_button.delete(0, "end")
-                    self.main_button.insert(0, f"{event.button}")
-                    self.main_button.configure(state="readonly")
-                    return
+            if is_main_button:
+                for event in pygame.event.get():
+                    if event.type == pygame.JOYBUTTONDOWN:
+                        self.main_button.configure(state="normal")
+                        self.main_button.delete(0, "end")
+                        self.main_button.insert(0, f"{event.button}")
+                        self.main_button.configure(state="readonly")
+                        return
+            else:
+                for event in pygame.event.get():
+                    if event.type == pygame.JOYBUTTONDOWN:
+                        self.second_button.configure(state="normal")
+                        self.second_button.delete(0, "end")
+                        self.second_button.insert(0, f"{event.button}")
+                        self.second_button.configure(state="readonly")
+                        return
             pygame.time.wait(100)
         self.dropdown.configure(state="normal")
 
-    def detect_key_second(self):
+    def get_idx_device_selected(self):
         self.dropdown.configure(state="disabled")
-        start_time = time.time()
-        # TODO: change the index of the joystick
-        joystick = pygame.joystick.Joystick(2)
-        joystick.init()
-        while True:
-            if time.time() - start_time > 7.5:
-                break
-            for event in pygame.event.get():
-                if event.type == pygame.JOYBUTTONDOWN:
-                    self.second_button.configure(state="normal")
-                    self.second_button.delete(0, "end")
-                    self.second_button.insert(0, f"{event.button}")
-                    self.second_button.configure(state="readonly")
-                    return
-            pygame.time.wait(100)
-        self.dropdown.configure(state="normal")
+        return self.devices.index(self.dropdown.get())
