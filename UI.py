@@ -135,8 +135,8 @@ class UI:
                 break
             for event in pygame.event.get():
                 if event.type == pygame.JOYBUTTONDOWN:
-                    self.main_button.delete(0, "end")
                     self.main_button.configure(state="normal")
+                    self.main_button.delete(0, "end")
                     self.main_button.insert(0, f"{event.button}")
                     self.main_button.configure(state="readonly")
                     return
@@ -154,8 +154,8 @@ class UI:
                 break
             for event in pygame.event.get():
                 if event.type == pygame.JOYBUTTONDOWN:
-                    self.second_button.delete(0, "end")
                     self.second_button.configure(state="normal")
+                    self.second_button.delete(0, "end")
                     self.second_button.insert(0, f"{event.button}")
                     self.second_button.configure(state="readonly")
                     return
