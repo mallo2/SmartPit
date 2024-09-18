@@ -1,9 +1,15 @@
+import asyncio
+import os
+import time
+
+import edge_tts
 import pygame
 import sounddevice as sd
 import wavio
 import numpy as np
 import whisper
 from dotenv import get_key
+
 
 def save_audio(recording_data, sample_rate=44100):
     """
@@ -25,6 +31,7 @@ def record_audio(recording_data: list, sample_rate=44100):
     :param sample_rate:
     :return:
     """
+
     def callback(indata, _frames, _time, _status):
         recording_data.append(indata.copy())
 
@@ -42,6 +49,29 @@ def play_welcome_sound():
     pygame.mixer.init()
     pygame.mixer.music.load("ressources/sounds/welcome_message.mp3")
     pygame.mixer.music.play()
+
+
+async def play_audio(message):
+    """
+    FR : Méthode permettant de jouer un message audio\n
+    EN : Method to play an audio message\n
+    :param message:
+    :return:
+    """
+    tts = edge_tts.Communicate(message, voice="fr-FR-VivienneMultilingualNeural")
+    await tts.save(get_key('.env', 'RESPONSE_FILENAME'))
+    pygame.mixer.init()
+    pygame.mixer.music.load(get_key('.env', 'RESPONSE_FILENAME'))
+    pygame.mixer.music.play()
+
+    # Wait until the audio finishes playing
+    while pygame.mixer.music.get_busy():
+        time.sleep(1)
+
+    # Stop, unload, and delete the file
+    pygame.mixer.music.stop()
+    pygame.mixer.music.unload()
+
 
 
 class AudioAI:

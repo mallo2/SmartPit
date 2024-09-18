@@ -1,10 +1,11 @@
+import asyncio
 import os
 import sys
 import threading
 import re
 import pygame
 from dotenv import get_key
-from AudioAI import AudioAI, record_audio, save_audio, play_welcome_sound
+from AudioAI import AudioAI, record_audio, save_audio, play_welcome_sound, play_audio
 from TextAI import TextAI
 from IRacing import IRacing
 from customtkinter import CTk
@@ -36,6 +37,7 @@ def process(text_AI: TextAI, audio_AI: AudioAI, ir: IRacing, try_count: int):
     function = informations_requested["response"]
     match = re.match(r"(\w+)\((.*)\)", function)
     if try_count >= 3:
+        delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
         return {
             "question": question,
             "response": "Je n'ai pas compris votre demande"
@@ -65,7 +67,6 @@ def process(text_AI: TextAI, audio_AI: AudioAI, ir: IRacing, try_count: int):
         return process(text_AI=text_AI, audio_AI=audio_AI, ir=ir, try_count=try_count)
 
 
-
 def launch_application(idx):
     pygame.init()
     pygame.joystick.init()
@@ -82,6 +83,7 @@ def launch_application(idx):
             if event.type == pygame.JOYBUTTONDOWN and event.button == int(
                     get_key('.env', 'MAIN_BUTTON')) and not is_recording:
                 print("Début de l'enregistrement")
+                delete_file_if_exists(get_key('.env', 'RESPONSE_FILENAME'))
                 recording_data = []
                 stream = record_audio(recording_data)
                 is_recording = True
@@ -93,7 +95,7 @@ def launch_application(idx):
                 save_audio(recording_data)
                 processed = process(text_AI=text_AI, audio_AI=audio_AI, ir=ir, try_count=0)
                 response = text_AI.generate_response(processed["question"], processed["response"])
-                print(response)
+                asyncio.run(play_audio(response))
             elif event.type == pygame.JOYBUTTONDOWN and event.button == get_key('.env', 'SECOND_BUTTON'):
                 threading.Thread(target=ir.thread_fuel_consumption).start()
 

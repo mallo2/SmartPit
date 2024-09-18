@@ -8,3 +8,4 @@ numpy
 groq
 customtkinter
 Pillow
+edge-tts
