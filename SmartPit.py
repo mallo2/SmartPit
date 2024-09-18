@@ -5,7 +5,7 @@ import re
 import pygame
 from dotenv import get_key
 from AudioAI import AudioAI, record_audio, save_audio, play_welcome_sound
-import TextAI as TextAI
+from TextAI import TextAI
 from IRacing import IRacing
 from customtkinter import CTk
 from UI import UI
@@ -30,24 +30,40 @@ def get_devices_name():
     return names
 
 
-def process(text_AI: TextAI.TextAI, audio_AI: AudioAI, ir: IRacing):
+def process(text_AI: TextAI, audio_AI: AudioAI, ir: IRacing, try_count: int):
     informations_requested = text_AI.process_request(audioAI=audio_AI)
-    match = re.match(r"(\w+)\((.*)\)", informations_requested)
+    question = informations_requested["audio_text"]
+    function = informations_requested["response"]
+    match = re.match(r"(\w+)\((.*)\)", function)
+    if try_count >= 3:
+        return {
+            "question": question,
+            "response": "Je n'ai pas compris votre demande"
+        }
     if match:
         method_name = match.group(1)
         args = match.group(2)
         method = getattr(ir, method_name)
         if args == "" or args is None:
+            # TODO: Gérer l exception si la méthode bug
             data_result = method()
             delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
-            return data_result
+            return {
+                "question": question,
+                "response": data_result
+            }
         arg_values = [eval(arg.strip()) for arg in args.split(',')]
         data_result = method(*arg_values)
         delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
-        return data_result
+        return {
+            "question": question,
+            "response": data_result
+        }
     else:
+        try_count += 1
         print("Format de chaîne invalide")
-        process(text_AI=text_AI, audio_AI=audio_AI, ir=ir)
+        return process(text_AI=text_AI, audio_AI=audio_AI, ir=ir, try_count=try_count)
+
 
 
 def launch_application(idx):
@@ -57,24 +73,27 @@ def launch_application(idx):
     joystick.init()
     ir = IRacing()
     audio_AI = AudioAI()
-    text_AI = TextAI.TextAI()
+    text_AI = TextAI()
     play_welcome_sound()
     is_recording = False
     recording_data = []
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.JOYBUTTONDOWN and event.button == int(get_key('.env', 'MAIN_BUTTON')) and not is_recording:
+            if event.type == pygame.JOYBUTTONDOWN and event.button == int(
+                    get_key('.env', 'MAIN_BUTTON')) and not is_recording:
                 print("Début de l'enregistrement")
                 recording_data = []
                 stream = record_audio(recording_data)
                 is_recording = True
-            elif event.type == pygame.JOYBUTTONUP and event.button == int(get_key('.env', 'MAIN_BUTTON')) and is_recording:
+            elif event.type == pygame.JOYBUTTONUP and event.button == int(
+                    get_key('.env', 'MAIN_BUTTON')) and is_recording:
                 stream.stop()
                 stream.close()
                 is_recording = False
                 save_audio(recording_data)
-                data_result = process(text_AI=text_AI, audio_AI=audio_AI, ir=ir)
-                print(data_result)
+                processed = process(text_AI=text_AI, audio_AI=audio_AI, ir=ir, try_count=0)
+                response = text_AI.generate_response(processed["question"], processed["response"])
+                print(response)
             elif event.type == pygame.JOYBUTTONDOWN and event.button == get_key('.env', 'SECOND_BUTTON'):
                 threading.Thread(target=ir.thread_fuel_consumption).start()
 
