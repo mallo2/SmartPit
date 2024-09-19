@@ -13,11 +13,22 @@ from UI import UI
 
 
 def delete_file_if_exists(filename):
+    """
+    FR : Méthode permettant de supprimer un fichier s'il existe\n
+    EN : Method to delete a file if it exists
+    :param filename:
+    :return:
+    """
     if os.path.exists(filename):
         os.remove(filename)
 
 
 def get_devices_name():
+    """
+    FR : Méthode permettant de récupérer les noms des périphériques de jeu\n
+    EN : Method to get the names of the game devices
+    :return:
+    """
     names = []
     pygame.init()
     pygame.joystick.init()
@@ -32,6 +43,15 @@ def get_devices_name():
 
 
 def process(text_AI: TextAI, audio_AI: AudioAI, ir: IRacing, try_count: int):
+    """
+    FR : Méthode permettant de traiter la demande\n
+    EN : Method to process the request
+    :param text_AI:
+    :param audio_AI:
+    :param ir:
+    :param try_count:
+    :return:
+    """
     informations_requested = text_AI.process_request(audioAI=audio_AI)
     question = informations_requested["audio_text"]
     function = informations_requested["response"]
@@ -68,6 +88,12 @@ def process(text_AI: TextAI, audio_AI: AudioAI, ir: IRacing, try_count: int):
 
 
 def launch_application(idx):
+    """
+    FR : Méthode permettant de lancer l'application\n
+    EN : Method to launch the application
+    :param idx:
+    :return:
+    """
     pygame.init()
     pygame.joystick.init()
     joystick = pygame.joystick.Joystick(idx)
@@ -104,6 +130,10 @@ def launch_application(idx):
 
 class SmartPit(CTk):
     def __init__(self):
+        """
+        FR : Constructeur de la classe\n
+        EN : Constructor of the class
+        """
         super().__init__()
         UI(self, get_devices_name())
 
