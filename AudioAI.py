@@ -1,7 +1,4 @@
-import asyncio
-import os
 import time
-
 import edge_tts
 import pygame
 import sounddevice as sd

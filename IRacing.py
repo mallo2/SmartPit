@@ -1,5 +1,5 @@
-from asyncio import sleep
 import irsdk
+from asyncio import sleep
 
 def format_lap_time(lap_time: float) -> str:
     """

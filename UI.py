@@ -1,7 +1,6 @@
 import time
-from functools import partial
-
 import pygame
+from functools import partial
 from PIL import Image
 from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkEntry, CTkComboBox, CTkButton
 from dotenv import set_key, get_key
