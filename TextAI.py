@@ -12,7 +12,6 @@ class TextAI:
         EN : Constructor of the TextAI class
         """
         self.model = Groq(api_key=get_key('.env', 'GROQ_API_KEY'))
-
     def process_request(self, request: str) -> dict:
         """
         FR : Méthode permettant de traiter la demande avec un appel à l'API de Groq\n
@@ -37,7 +36,6 @@ class TextAI:
             "audio_text": request,
             "response": response
         }
-
     def generate_response(self, question:str, data:str) -> str:
         """
         FR : Méthode permettant de générer une réponse avec un appel à l'API de Groq\n

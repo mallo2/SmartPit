@@ -16,7 +16,6 @@ class DataConverter:
             EN : Formatted lap time
         """
         return f"{int(lap_time / 60)}:{lap_time % 60:.3f}"
-
     @staticmethod
     def int_to_pourcentage(i: int) -> str:
         """
@@ -30,7 +29,6 @@ class DataConverter:
             EN : Formatted percentage
         """
         return f"{i}%"
-
     @staticmethod
     def float_to_pourcentage(f: float) -> str:
         """
@@ -44,7 +42,6 @@ class DataConverter:
             EN : Formatted percentage
         """
         return f"{f}%"
-
     @staticmethod
     def int_to_liters(i: int) -> str:
         """
@@ -58,7 +55,6 @@ class DataConverter:
             EN : Formatted volume
         """
         return f"{i}L"
-
     @staticmethod
     def int_to_laps_number(i: int) -> str:
         """
@@ -72,7 +68,6 @@ class DataConverter:
             EN : Formatted number of laps
         """
         return f"{i} tours"
-
     @staticmethod
     def float_to_celsius_degrees(t: float) -> str:
         """

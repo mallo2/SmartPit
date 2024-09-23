@@ -2,7 +2,6 @@ import irsdk
 from asyncio import sleep
 from Converter import DataConverter
 
-
 class IRacing:
     """
     FR : Classe permettant de récupérer les informations du jeu IRacing\n
@@ -15,7 +14,6 @@ class IRacing:
         """
         self.ir = irsdk.IRSDK()
         self.ir.startup()
-
     def __idx_of_behind_player(self) -> int:
         """
         FR : Méthode privée permettant de récupérer l'index de la voiture derrière l'utilisateur\n
@@ -25,7 +23,6 @@ class IRacing:
             EN : Index of the car behind the user
         """
         return self.ir['CarIdxPosition'].index(self.ir['PlayerCarPosition'] + 1)
-
     def __idx_of_ahead_player(self) -> int:
         """
         FR : Méthode privée permettant de récupérer l'index de la voiture devant l'utilisateur\n
@@ -35,7 +32,6 @@ class IRacing:
             EN : Index of the car in the ranking ahead of the user
         """
         return self.ir['CarIdxPosition'].index(self.ir['PlayerCarPosition'] - 1)
-
     def __idx_of_ahead_car(self) -> int:
         """
         FR : Méthode privée permettant de récupérer l'index de la voiture devant l'utilisateur\n
@@ -58,7 +54,6 @@ class IRacing:
                 min_distance_diff = distance_diff
                 closest_car_idx = idx
         return closest_car_idx
-
     def __idx_of_behind_car(self) -> int:
         """
         FR : Méthode privée permettant de récupérer l'index de la voiture derrière l'utilisateur\n
@@ -81,7 +76,6 @@ class IRacing:
                 min_distance_diff = distance_diff
                 closest_car_idx = idx
         return closest_car_idx
-
     def __is_hotlap(self) -> bool:
         """
         FR : Méthode privée permettant de savoir si l'utilisateur est en hotlap ou non\n
@@ -91,7 +85,6 @@ class IRacing:
             EN : True if the user is in a hotlap, False otherwise
         """
         return self.ir['SessionTimeRemain'] == -1
-
     def __is_race_mesured_laps(self) -> bool:
         """
         FR : Méthode privée permettant de savoir si la course est mesurée en tours ou non\n
@@ -101,7 +94,6 @@ class IRacing:
             EN : True if the race is measured in laps, False otherwise
         """
         return self.ir['SessionTimeTotal'] == 86400.0
-
     def __is_race_mesured_time(self) -> bool:
         """
         FR : Méthode privée permettant de savoir si la course est mesurée en temps ou non\n
@@ -111,7 +103,6 @@ class IRacing:
             EN : True if lap is measured in time, False otherwise
         """
         return self.ir['SessionLapsRemainEx'] == 32767
-
     def __is_race_over(self) -> bool:
         """
         FR : Méthode privée permettant de savoir si la course est terminée ou non\n
@@ -122,7 +113,6 @@ class IRacing:
         """
         return (self.ir['SessionTimeRemain'] == 0 and self.__is_race_mesured_time()) or (
                 self.ir['SessionLapsRemainEx'] == 0 and self.__is_race_mesured_laps())
-
     def __best_session_lap_time(self) -> float:
         """
         FR : Méthode privée permettant de récupérer le meilleur tour de la session\n
@@ -136,7 +126,6 @@ class IRacing:
             if lap_time < min_lap_time and lap_time != -1:
                 min_lap_time = lap_time
         return min_lap_time
-
     def thread_fuel_consumption(self) -> None:
         """
         FR : Thread permettant de récupérer la moyenne de carburant consommé tant que la session est en cours\n
@@ -152,7 +141,6 @@ class IRacing:
             average_fuel_consumption_by_second = fuel_consumption_by_hour / repetition / 3600
             sleep(0.1)
         print("Fin de la course")
-
     def my_position(self) -> str:
         """
         FR : Méthode permettant de récupérer la position de l'utilisateur\n
@@ -162,7 +150,6 @@ class IRacing:
             EN : User's position
         """
         return str(self.ir['PlayerCarPosition'])
-
     def count_total_laps(self) -> str:
         """
         FR : Méthode permettant de récupérer le nombre de tours total de la course\n
@@ -175,7 +162,6 @@ class IRacing:
             return DataConverter.int_to_laps_number(self.ir['SessionLapsTotal'])
         else:
             return self.duration_race()
-
     def count_remaining_laps(self) -> str:
         """
         FR : Méthode permettant de récupérer le nombre de tours restants de la course\n
@@ -188,7 +174,6 @@ class IRacing:
             return DataConverter.int_to_laps_number(self.ir['SessionLapsRemainEx'])
         else:
             return self.duration_remaining()
-
     def duration_race(self) -> str:
         """
         FR : Méthode permettant de récupérer la durée totale de la course\n
@@ -201,7 +186,6 @@ class IRacing:
             return DataConverter.format_lap_time(self.ir['SessionTimeTotal'])
         else:
             return self.count_total_laps()
-
     def duration_remaining(self) -> str:
         """
         FR : Méthode permettant de récupérer la durée restante de la course\n
@@ -214,7 +198,6 @@ class IRacing:
             return DataConverter.format_lap_time(self.ir['SessionTimeRemain'])
         else:
             return self.count_remaining_laps()
-
     def my_best_lap_time(self) -> str:
         """
         FR : Méthode permettant de récupérer le meilleur tour de l'utilisateur\n
@@ -225,7 +208,6 @@ class IRacing:
         """
         best_lap_time = self.ir['LapBestLapTime']
         return DataConverter.format_lap_time(best_lap_time)
-
     def my_last_lap_time(self) -> str:
         """
         FR : Méthode permettant de récupérer le dernier tour de l'utilisateur\n
@@ -236,7 +218,6 @@ class IRacing:
         """
         last_lap_time = self.ir['LapLastLapTime']
         return DataConverter.format_lap_time(last_lap_time)
-
     def incident_count(self) -> str:
         """
         FR : Méthode permettant de récupérer le nombre d'incidents de l'utilisateur\n
@@ -246,7 +227,6 @@ class IRacing:
             EN : Number of incidents of the user
         """
         return str(self.ir['PlayerCarMyIncidentCount'])
-
     def best_session_lap_time(self) -> str:
         """
         FR : Méthode permettant de récupérer le meilleur tour de la session\n
@@ -256,7 +236,6 @@ class IRacing:
             EN : Formatted time of the best lap of the session
         """
         return DataConverter.format_lap_time(self.__best_session_lap_time())
-
     def best_lap_time_ahead_car(self) -> str:
         """
         FR : Méthode permettant de récupérer le meilleur tour de l'utilisateur devant\n
@@ -267,7 +246,6 @@ class IRacing:
         """
         best_lap_time = self.ir['CarIdxBestLapTime'][self.__idx_of_ahead_player()]
         return DataConverter.format_lap_time(best_lap_time)
-
     def last_lap_time_ahead_car(self) -> str:
         """
         FR : Méthode permettant de récupérer le dernier tour de l'utilisateur devant
@@ -278,7 +256,6 @@ class IRacing:
         """
         last_lap_time = self.ir['CarIdxLastLapTime'][self.__idx_of_ahead_player()]
         return DataConverter.format_lap_time(last_lap_time)
-
     def best_lap_time_behind_car(self) -> str:
         """
         FR : Méthode permettant de récupérer le meilleur tour de l'utilisateur derrière\n
@@ -289,7 +266,6 @@ class IRacing:
         """
         best_lap_time = self.ir['CarIdxBestLapTime'][self.__idx_of_behind_player()]
         return DataConverter.format_lap_time(best_lap_time)
-
     def last_lap_time_behind_car(self) -> str:
         """
         FR : Méthode permettant de récupérer le dernier tour de l'utilisateur derrière\n
@@ -300,7 +276,6 @@ class IRacing:
         """
         last_lap_time = self.ir['CarIdxBestLapTime'][self.__idx_of_behind_player()]
         return DataConverter.format_lap_time(last_lap_time)
-
     def declared_wet(self) -> str:
         """
         FR : Méthode permettant de savoir si les pneus pluie sont autorisés ou non\n
@@ -310,7 +285,6 @@ class IRacing:
             EN : True if wet tires are allowed, False otherwise
         """
         return str(self.ir['WeatherDeclaredWet'] == 1)
-
     def pourcentage_humidity(self) -> str:
         """
         FR : Méthode récupérant le pourcentage d'humidité\n
@@ -320,7 +294,6 @@ class IRacing:
             EN : Humidity percentage
         """
         return DataConverter.int_to_pourcentage(self.ir['RelativeHumidity'])
-
     def pourcentage_precipation(self) -> str:
         """
         FR : Méthode récupérant le pourcentage de précipitation\n
@@ -330,7 +303,6 @@ class IRacing:
             EN : Precipitation percentage
         """
         return DataConverter.int_to_pourcentage(self.ir['Precipitation'])
-
     def remaining_litres_of_fuel(self) -> str:
         """
         FR : Méthode récupérant les litres restants de carburant\n
@@ -340,7 +312,6 @@ class IRacing:
             EN : Remaining liters of fuel
         """
         return DataConverter.int_to_liters(self.ir['FuelLevel'])
-
     def remaining_pourcentage_of_fuel(self) -> str:
         """
         FR : Méthode récupérant le pourcentage restant de carburant\n
@@ -350,7 +321,6 @@ class IRacing:
             EN : Remaining percentage of fuel
         """
         return DataConverter.int_to_pourcentage(self.ir['FuelLevelPct'])
-
     def get_fuel_necessary(self) -> str:
         """
         FR : Méthode afin de calculer les litres nécéssaires de carburant pour terminer la course\n
@@ -372,7 +342,6 @@ class IRacing:
             return "Vous avez assez de carburant"
         else:
             return f"Il manque {fuel_necessary}L de carburant pour finir la course."
-
     def gap_with_front_car(self) -> str:
         """
         FR : Méthode afin de calculer l'écart avec la voiture devant l'utilisateur\n
@@ -388,7 +357,6 @@ class IRacing:
         car_est_time = self.ir["CarIdxEstTime"][car_idx]
         relative_time = car_est_time - player_est_time
         return DataConverter.format_lap_time(relative_time)
-
     def gap_with_behind_car(self) -> str:
         """
         FR : Méthode permettant de calculer l'écart avec la voiture derrière l'utilisateur\n
@@ -407,21 +375,18 @@ class IRacing:
         else:
             relative_time = self.__best_session_lap_time() - car_est_time
         return DataConverter.format_lap_time(relative_time - 1.5)
-
     def get_wet_tires(self) -> None:
         """
         FR : Méthode permettant de mettre les pneus pluies à l'utilisateur\n
         EN : Method to put wet tires to the user
         """
         self.ir.pit_command(irsdk.PitCommandMode.type_tires, 1)
-
     def get_dry_tires(self) -> None:
         """
         FR : Méthode permettant de mettre les pneus secs à l'utilisateur\n
         EN : Method to put dry tires to the user
         """
         self.ir.pit_command(irsdk.PitCommandMode.type_tires, 0)
-
     def add_fuel(self, fuel_quantity: int) -> None:
         """
         FR : Méthode permettant d'ajouter les litres de carburant demandés\n
@@ -431,35 +396,30 @@ class IRacing:
             EN : Liters of fuel to add
         """
         self.ir.pit_command(irsdk.PitCommandMode.fuel, fuel_quantity)
-
     def change_front_left_tire(self) -> None:
         """
         FR : Méthode permettant de changer le pneu avant gauche\n
         EN : Method to change the front left tire
         """
         self.ir.pit_command(irsdk.PitCommandMode.lf)
-
     def change_rear_left_tire(self) -> None:
         """
         FR : Méthode permettant de changer le pneu arrière gauche\n
         EN : Method to change the rear left tire
         """
         self.ir.pit_command(irsdk.PitCommandMode.lr)
-
     def change_front_right_tire(self) -> None:
         """
         FR : Méthode permettant de changer le pneu avant droit\n
         EN : Method to change the front right tire
         """
         self.ir.pit_command(irsdk.PitCommandMode.rf)
-
     def change_rear_right_tire(self) -> None:
         """
         FR : Méthode permettant de changer le pneu arrière droit\n
         EN : Method to change the rear right tire
         """
         self.ir.pit_command(irsdk.PitCommandMode.rr)
-
     def count_sets_of_tires(self) -> str:
         """
         FR : Méthode permettant de récupérer le nombre de sets de pneus disponibles\n
@@ -472,7 +432,6 @@ class IRacing:
         if count == 255 or count is None:
             return "Infini"
         return str(count)
-
     def count_sets_of_front_right_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le nombre de pneus avant droit disponibles\n
@@ -485,7 +444,6 @@ class IRacing:
         if count == 255 or count is None:
             return "Infini"
         return str(count)
-
     def temperature_of_front_right_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer la température du pneu avant droit\n
@@ -495,7 +453,6 @@ class IRacing:
             EN : The average temperature of the front right tire in Celsius degrees from the left, middle, and right carcass.
         """
         return DataConverter.float_to_celsius_degrees((self.ir['RFtempCL'] + self.ir['RFtempCM'] + self.ir['RFtempCR']) / 3)
-
     def remaining_percentage_of_front_right_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le pourcentage restant du pneu avant droit\n
@@ -505,7 +462,6 @@ class IRacing:
             EN : The average percentage of the front right tire from the left, middle, and right carcass.
         """
         return DataConverter.float_to_pourcentage((self.ir['RFwearL'] + self.ir['RFwearM'] + self.ir['RFwearR']) / 3)
-
     def count_sets_of_rear_right_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le nombre de pneus arrière droit disponibles\n
@@ -518,7 +474,6 @@ class IRacing:
         if count == 255 or count is None:
             return "Infini"
         return str(count)
-
     def temperature_of_rear_right_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer la température du pneu arrière droit\n
@@ -528,7 +483,6 @@ class IRacing:
             EN : The average temperature of the rear right tire in Celsius degrees from the left, middle, and right carcass.
         """
         return DataConverter.float_to_celsius_degrees((self.ir['RRtempCL'] + self.ir['RRtempCM'] + self.ir['RRtempCR']) / 3)
-
     def remaining_percentage_of_rear_right_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le pourcentage restant du pneu arrière droit\n
@@ -538,7 +492,6 @@ class IRacing:
             EN: The average percentage of the rear right tire from the left, middle, and right carcass.
         """
         return DataConverter.float_to_pourcentage((self.ir['RRwearL'] + self.ir['RRwearM'] + self.ir['RRwearR']) / 3)
-
     def count_sets_of_front_left_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le nombre de pneus avant gauche disponibles\n
@@ -551,7 +504,6 @@ class IRacing:
         if count == 255 or count is None:
             return "Infini"
         return str(count)
-
     def temperature_of_front_left_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer la température du pneu avant gauche\n
@@ -561,7 +513,6 @@ class IRacing:
             EN : The average temperature of the front left tire in Celsius degrees from the left, middle, and right carcass.
         """
         return DataConverter.float_to_celsius_degrees((self.ir['LFtempCL'] + self.ir['LFtempCM'] + self.ir['LFtempCR']) / 3)
-
     def remaining_percentage_of_front_left_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le pourcentage restant du pneu avant gauche\n
@@ -571,7 +522,6 @@ class IRacing:
             EN : The average percentage of the front left tire from the left, middle, and right carcass.
         """
         return DataConverter.float_to_pourcentage((self.ir['LFwearL'] + self.ir['LFwearM'] + self.ir['LFwearR']) / 3)
-
     def count_sets_of_rear_left_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le nombre de pneus arrière gauche disponibles\n
@@ -584,7 +534,6 @@ class IRacing:
         if count == 255 or count is None:
             return "Infini"
         return str(count)
-
     def temperature_of_rear_left_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer la température du pneu arrière gauche.\n
@@ -594,7 +543,6 @@ class IRacing:
             EN : The average temperature of the rear left tire in Celsius degrees from the left, middle, and right carcass.
         """
         return DataConverter.float_to_celsius_degrees((self.ir['LRtempCL'] + self.ir['LRtempCM'] + self.ir['LRtempCR']) / 3)
-
     def remaining_percentage_of_rear_left_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le pourcentage restant du pneu arrière gauche\n
