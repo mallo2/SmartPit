@@ -55,7 +55,7 @@ async def play_audio(message):
     :param message:
     :return:
     """
-    tts = edge_tts.Communicate(message, voice="fr-FR-VivienneMultilingualNeural")
+    tts = edge_tts.Communicate(message, voice=get_key('.env', 'SPEECH_VOICE'))
     await tts.save(get_key('.env', 'RESPONSE_FILENAME'))
     pygame.mixer.init()
     pygame.mixer.music.load(get_key('.env', 'RESPONSE_FILENAME'))
