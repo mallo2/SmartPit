@@ -5,7 +5,7 @@ import threading
 import re
 import pygame
 from dotenv import get_key
-from AudioAI import AudioAI, record_audio, save_audio, play_welcome_sound, play_audio
+from AudioAI import AudioAI
 from TextAI import TextAI
 from IRacing import IRacing
 from customtkinter import CTk
@@ -101,7 +101,7 @@ def launch_application(idx):
     ir = IRacing()
     audio_AI = AudioAI()
     text_AI = TextAI()
-    play_welcome_sound()
+    audio_AI.play_welcome_sound()
     is_recording = False
     recording_data = []
     while True:
@@ -111,17 +111,17 @@ def launch_application(idx):
                 print("Début de l'enregistrement")
                 delete_file_if_exists(get_key('.env', 'RESPONSE_FILENAME'))
                 recording_data = []
-                stream = record_audio(recording_data)
+                stream = audio_AI.record_audio(recording_data)
                 is_recording = True
             elif event.type == pygame.JOYBUTTONUP and event.button == int(
                     get_key('.env', 'MAIN_BUTTON')) and is_recording:
                 stream.stop()
                 stream.close()
                 is_recording = False
-                save_audio(recording_data)
+                audio_AI.save_audio(recording_data)
                 processed = process(text_AI=text_AI, audio_AI=audio_AI, ir=ir, try_count=0)
                 response = text_AI.generate_response(processed["question"], processed["response"])
-                asyncio.run(play_audio(response))
+                asyncio.run(audio_AI.play_audio(response))
             elif event.type == pygame.JOYBUTTONDOWN and event.button == get_key('.env', 'SECOND_BUTTON'):
                 threading.Thread(target=ir.thread_fuel_consumption).start()
 
