@@ -151,7 +151,7 @@ class UI:
         capture_textbox.pack(side="left")
 
         capture_textbox.insert(0, env_key)
-        button = CTkButton(frame, text=text, command=partial(self.detect_key))
+        button = CTkButton(frame, text=text, command=partial(self.detect_key, capture_textbox))
 
         capture_textbox.configure(state="readonly")
         button.pack(side="left", padx=5)
