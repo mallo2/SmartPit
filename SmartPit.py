@@ -11,6 +11,17 @@ from IRacing import IRacing
 from customtkinter import CTk
 from UI import UI
 
+def change_order_devices(devices):
+    """
+    FR : Méthode permettant de changer l'ordre des devices en placant le périphérique sélectionné en premier\n
+    EN : Method to change the order of the devices by placing the selected device first
+    :param devices:
+    :return:
+    """
+    selected_device = get_key('.env', 'SELECTED_DEVICE')
+    if selected_device and selected_device != "" and selected_device in devices:
+        devices.remove(selected_device)
+        devices.insert(0, selected_device)
 
 def delete_file_if_exists(filename):
     """
@@ -136,7 +147,9 @@ class SmartPit(CTk):
         EN : Constructor of the class
         """
         super().__init__()
-        UI(self, get_devices_name())
+        devices = get_devices_name()
+        change_order_devices(devices)
+        UI(self, devices)
 
 
 if __name__ == "__main__":
