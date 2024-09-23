@@ -32,6 +32,20 @@ class DataConverter:
         return f"{i}%"
 
     @staticmethod
+    def float_to_pourcentage(f: float) -> str:
+        """
+        FR : Méthode convertisseur d'un float à un pourcentage\n
+        EN : Method to convert a float to a percentage
+        :param f: (int)
+            FR : Float à transformer
+            EN : Float to transform
+        :return:
+            FR : Pourcentage formaté
+            EN : Formatted percentage
+        """
+        return f"{f}%"
+
+    @staticmethod
     def int_to_liters(i: int) -> str:
         """
         FR : Méthode convertisseur d'un chrono de float à un volume\n
@@ -58,3 +72,17 @@ class DataConverter:
             EN : Formatted number of laps
         """
         return f"{i} tours"
+
+    @staticmethod
+    def float_to_celsius_degrees(t: float) -> str:
+        """
+        FR : Méthode convertisseur d'un float vers une température en degré celsius\n
+        EN : Method to convert a float to a temperature in celsius degrees
+        :param t: (float)
+            FR : Température en degré celsius
+            EN : Temperature in celsius degrees
+        :return: (str)
+            FR : Température formatée
+            EN : Formatted temperature
+        """
+        return f"{t}°C"

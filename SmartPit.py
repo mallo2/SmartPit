@@ -52,7 +52,8 @@ def process(text_AI: TextAI, audio_AI: AudioAI, ir: IRacing, try_count: int):
     :param try_count:
     :return:
     """
-    informations_requested = text_AI.process_request(audioAI=audio_AI)
+    request = audio_AI.transcribe_audio()
+    informations_requested = text_AI.process_request(request=request)
     question = informations_requested["audio_text"]
     function = informations_requested["response"]
     match = re.match(r"(\w+)\((.*)\)", function)

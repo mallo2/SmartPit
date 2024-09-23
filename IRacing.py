@@ -237,7 +237,7 @@ class IRacing:
         last_lap_time = self.ir['LapLastLapTime']
         return DataConverter.format_lap_time(last_lap_time)
 
-    def incident_count(self) -> int:
+    def incident_count(self) -> str:
         """
         FR : Méthode permettant de récupérer le nombre d'incidents de l'utilisateur\n
         EN : Method to get the number of incidents of the user
@@ -245,7 +245,7 @@ class IRacing:
             FR : Nombre d'incidents de l'utilisateur
             EN : Number of incidents of the user
         """
-        return self.ir['PlayerCarMyIncidentCount']
+        return str(self.ir['PlayerCarMyIncidentCount'])
 
     def best_session_lap_time(self) -> str:
         """
@@ -301,7 +301,7 @@ class IRacing:
         last_lap_time = self.ir['CarIdxBestLapTime'][self.__idx_of_behind_player()]
         return DataConverter.format_lap_time(last_lap_time)
 
-    def declared_wet(self) -> bool:
+    def declared_wet(self) -> str:
         """
         FR : Méthode permettant de savoir si les pneus pluie sont autorisés ou non\n
         EN : Method to know if wet tires are allowed or not
@@ -309,7 +309,7 @@ class IRacing:
             FR : True si les pneus pluie sont autorisés, False sinon
             EN : True if wet tires are allowed, False otherwise
         """
-        return self.ir['WeatherDeclaredWet'] == 1
+        return str(self.ir['WeatherDeclaredWet'] == 1)
 
     def pourcentage_humidity(self) -> str:
         """
@@ -486,25 +486,25 @@ class IRacing:
             return "Infini"
         return str(count)
 
-    def temperature_of_front_right_tire(self) -> float:
+    def temperature_of_front_right_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer la température du pneu avant droit\n
         EN : Method to get the temperature of the front right tire
-        :return: (float)
+        :return: (str)
             FR : Température moyenne du pneu avant droit en degrés Celsius à partir du flanc gauche, central et droit.
             EN : The average temperature of the front right tire in Celsius degrees from the left, middle, and right carcass.
         """
-        return (self.ir['RFtempCL'] + self.ir['RFtempCM'] + self.ir['RFtempCR']) / 3
+        return DataConverter.float_to_celsius_degrees((self.ir['RFtempCL'] + self.ir['RFtempCM'] + self.ir['RFtempCR']) / 3)
 
-    def remaining_percentage_of_front_right_tire(self) -> float:
+    def remaining_percentage_of_front_right_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le pourcentage restant du pneu avant droit\n
         EN : Method to get the remaining percentage of the front right tire
-        :return: (float)
+        :return: (str)
             FR : Pourcentage moyen du pneu avant droit à partir du flanc gauche, central et droit.
             EN : The average percentage of the front right tire from the left, middle, and right carcass.
         """
-        return (self.ir['RFwearL'] + self.ir['RFwearM'] + self.ir['RFwearR']) / 3
+        return DataConverter.float_to_pourcentage((self.ir['RFwearL'] + self.ir['RFwearM'] + self.ir['RFwearR']) / 3)
 
     def count_sets_of_rear_right_tire(self) -> str:
         """
@@ -519,25 +519,25 @@ class IRacing:
             return "Infini"
         return str(count)
 
-    def temperature_of_rear_right_tire(self) -> float:
+    def temperature_of_rear_right_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer la température du pneu arrière droit\n
         EN : Method to get the temperature of the rear right tire
-        :return: (float)
+        :return: (str)
             FR : Température moyenne du pneu arrière droit en degrés Celsius à partir du flanc gauche, central et droit.
             EN : The average temperature of the rear right tire in Celsius degrees from the left, middle, and right carcass.
         """
-        return (self.ir['RRtempCL'] + self.ir['RRtempCM'] + self.ir['RRtempCR']) / 3
+        return DataConverter.float_to_celsius_degrees((self.ir['RRtempCL'] + self.ir['RRtempCM'] + self.ir['RRtempCR']) / 3)
 
-    def remaining_percentage_of_rear_right_tire(self) -> float:
+    def remaining_percentage_of_rear_right_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le pourcentage restant du pneu arrière droit\n
         EN : Method to get the remaining percentage of the rear right tire
-        :return: (float)
+        :return: (str)
             FR: Pourcentage moyen du pneu arrière droit à partir du flanc gauche, central et droit.
             EN: The average percentage of the rear right tire from the left, middle, and right carcass.
         """
-        return (self.ir['RRwearL'] + self.ir['RRwearM'] + self.ir['RRwearR']) / 3
+        return DataConverter.float_to_pourcentage((self.ir['RRwearL'] + self.ir['RRwearM'] + self.ir['RRwearR']) / 3)
 
     def count_sets_of_front_left_tire(self) -> str:
         """
@@ -552,25 +552,25 @@ class IRacing:
             return "Infini"
         return str(count)
 
-    def temperature_of_front_left_tire(self) -> float:
+    def temperature_of_front_left_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer la température du pneu avant gauche\n
         EN : Method to get the temperature of the front left tire
-        :return: (float)
+        :return: (str)
             FR : Température moyenne du pneu avant gauche en degrés Celsius à partir du flanc gauche, central et droit.
             EN : The average temperature of the front left tire in Celsius degrees from the left, middle, and right carcass.
         """
-        return (self.ir['LFtempCL'] + self.ir['LFtempCM'] + self.ir['LFtempCR']) / 3
+        return DataConverter.float_to_celsius_degrees((self.ir['LFtempCL'] + self.ir['LFtempCM'] + self.ir['LFtempCR']) / 3)
 
-    def remaining_percentage_of_front_left_tire(self) -> float:
+    def remaining_percentage_of_front_left_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le pourcentage restant du pneu avant gauche\n
         EN : Method to get the remaining percentage of the front left tire
-        :return: (float)
+        :return: (st)
             FR : Pourcentage moyen du pneu avant gauche à partir du flanc gauche, central et droit.
             EN : The average percentage of the front left tire from the left, middle, and right carcass.
         """
-        return (self.ir['LFwearL'] + self.ir['LFwearM'] + self.ir['LFwearR']) / 3
+        return DataConverter.float_to_pourcentage((self.ir['LFwearL'] + self.ir['LFwearM'] + self.ir['LFwearR']) / 3)
 
     def count_sets_of_rear_left_tire(self) -> str:
         """
@@ -585,22 +585,22 @@ class IRacing:
             return "Infini"
         return str(count)
 
-    def temperature_of_rear_left_tire(self) -> float:
+    def temperature_of_rear_left_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer la température du pneu arrière gauche.\n
         EN : Method to get the temperature of the rear left tire
-        :return: (float)
+        :return: (str)
             FR : Température moyenne du pneu arrière gauche en degrés Celsius à partir du flanc gauche, central et droit.
             EN : The average temperature of the rear left tire in Celsius degrees from the left, middle, and right carcass.
         """
-        return (self.ir['LRtempCL'] + self.ir['LRtempCM'] + self.ir['LRtempCR']) / 3
+        return DataConverter.float_to_celsius_degrees((self.ir['LRtempCL'] + self.ir['LRtempCM'] + self.ir['LRtempCR']) / 3)
 
-    def remaining_percentage_of_rear_left_tire(self) -> float:
+    def remaining_percentage_of_rear_left_tire(self) -> str:
         """
         FR : Méthode permettant de récupérer le pourcentage restant du pneu arrière gauche\n
         EN : Method to get the remaining percentage of the rear left tire
-        :return: (float)
+        :return: (str)
             FR : Pourcentage moyen du pneu arrière gauche à partir du flanc gauche, central et droit.
             EN : The average percentage of the rear left tire from the left, middle, and right carcass.
         """
-        return (self.ir['LRwearL'] + self.ir['LRwearM'] + self.ir['LRwearR']) / 3
+        return DataConverter.float_to_pourcentage((self.ir['LRwearL'] + self.ir['LRwearM'] + self.ir['LRwearR']) / 3)
