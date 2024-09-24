@@ -6,6 +6,8 @@ import re
 import pygame
 from dotenv import get_key
 
+from IRacingError import IRacingError
+
 
 class MainPresenter:
     def __init__(self, ui, audio_AI, text_AI, ir):
@@ -97,9 +99,7 @@ class MainPresenter:
             method_name = match.group(1)
             args = match.group(2)
             method = getattr(self.__ir, method_name)
-
             if args == "" or args is None:
-                # TODO: Gérer l exception si la méthode bug
                 data_result = method()
                 print(f"Data :  {data_result}")
                 if data_result is None:
@@ -135,6 +135,12 @@ class MainPresenter:
         joystick = pygame.joystick.Joystick(idx)
         joystick.init()
         self.__audio_AI.play_welcome_sound()
+        try:
+            self.__ir.connect()
+        except IRacingError as e:
+            print(e)
+            # TODO : Afficher message d'erreur
+            return
         is_recording = False
         recording_data = []
         while True:

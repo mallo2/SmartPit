@@ -1,6 +1,7 @@
 import irsdk
 from asyncio import sleep
 from Converter import DataConverter
+from IRacingError import IRacingError
 
 
 class IRacing:
@@ -15,7 +16,6 @@ class IRacing:
         EN : Constructor of the IRacing class
         """
         self.__ir = irsdk.IRSDK()
-        self.__ir.startup()
 
     def __idx_of_behind_player(self) -> int:
         """
@@ -137,6 +137,16 @@ class IRacing:
             if lap_time < min_lap_time and lap_time != -1:
                 min_lap_time = lap_time
         return min_lap_time
+
+    def connect(self):
+        """
+        FR : Méthode permettant de se connecter à IRacing\n
+        EN : Method to connect to IRacing
+        :return:
+        """
+        self.__ir.startup()
+        if not self.__ir.is_initialized:
+            raise IRacingError("IRacing not initialized")
 
     def thread_fuel_consumption(self) -> None:
         """
@@ -606,6 +616,6 @@ class IRacing:
         EN : Method to get the remaining percentage of the rear left tire
         :return: (str)
             FR : Pourcentage moyen du pneu arrière gauche à partir du flanc gauche, central et droit.
-            EN : The average percentage of the rear left tire from the left, middle, and right carcass.
+            EN : The average percentage of the rear left tire from the left, middle, and right cOarcass.
         """
         return DataConverter.float_to_pourcentage((self.__ir['LRwearL'] + self.__ir['LRwearM'] + self.__ir['LRwearR']) / 3)
