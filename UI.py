@@ -16,6 +16,7 @@ class UI(CTk):
         EN : Constructor of the UI class
         """
         super().__init__()
+        self.original_devices = None
         self.devices = None
         self.presenter: Optional[MainPresenter] = None
         self.main = self.init_main(self)
@@ -41,7 +42,7 @@ class UI(CTk):
             EN :
         """
         self.presenter = presenter
-        self.devices = presenter.devices
+        self.devices, self.original_devices = presenter.devices
         self.set_dropdown(self.devices)
 
     @staticmethod
@@ -248,4 +249,4 @@ class UI(CTk):
             EN :
         """
         self.dropdown.configure(state="disabled")
-        return self.devices.index(self.dropdown.get())
+        return self.original_devices.index(self.dropdown.get())

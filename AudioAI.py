@@ -7,17 +7,20 @@ import numpy as np
 import whisper
 from dotenv import get_key
 
+
 class AudioAI:
     """
     FR : Classe de l'IA audio\n
     EN : Audio AI class
     """
+
     def __init__(self):
         """
         FR : Constructeur de la classe AudioAI\n
         EN : Constructor of the AudioAI
         """
         self.model = whisper.load_model(get_key('.env', 'WHISPER_MODEL'))
+
     @staticmethod
     def save_audio(recording_data, sample_rate=44100) -> None:
         """
@@ -32,6 +35,7 @@ class AudioAI:
         """
         audio_array = np.concatenate(recording_data, axis=0)
         wavio.write(get_key('.env', 'FILENAME_RECORD'), audio_array, sample_rate, sampwidth=2)
+
     @staticmethod
     def record_audio(recording_data: list, sample_rate=44100) -> sd.InputStream:
         """
@@ -47,11 +51,14 @@ class AudioAI:
             FR : Stream d'entrée
             EN : Input stream
         """
+
         def callback(indata, _frames, _time, _status):
             recording_data.append(indata.copy())
+
         stream = sd.InputStream(callback=callback, channels=1, samplerate=sample_rate)
         stream.start()
         return stream
+
     @staticmethod
     def play_welcome_sound() -> None:
         """
@@ -61,6 +68,7 @@ class AudioAI:
         pygame.mixer.init()
         pygame.mixer.music.load("ressources/sounds/welcome_message.mp3")
         pygame.mixer.music.play()
+
     @staticmethod
     async def play_audio(message) -> None:
         """
@@ -79,6 +87,7 @@ class AudioAI:
             time.sleep(1)
         pygame.mixer.music.stop()
         pygame.mixer.music.unload()
+
     def transcribe_audio(self) -> str:
         """
         FR : Méthode permettant de transcrire l'audio en texte\n

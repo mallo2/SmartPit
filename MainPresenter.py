@@ -3,8 +3,11 @@ import os
 import sys
 import threading
 import re
+from typing import Tuple, List
+
 import pygame
 from dotenv import get_key
+
 
 def delete_file_if_exists(filename):
     """
@@ -15,6 +18,7 @@ def delete_file_if_exists(filename):
     """
     if os.path.exists(filename):
         os.remove(filename)
+
 
 def get_devices_name() -> list[str]:
     """
@@ -34,6 +38,7 @@ def get_devices_name() -> list[str]:
         names.append(f"{joystick.get_name()} ({joystick.get_numbuttons()})")
     return names
 
+
 def change_order_devices(devices) -> None:
     """
     FR : Méthode permettant de changer l'ordre des devices en placant le périphérique sélectionné en premier\n
@@ -46,10 +51,13 @@ def change_order_devices(devices) -> None:
         devices.remove(selected_device)
         devices.insert(0, selected_device)
 
-def get_ordered_devices() -> list[str]:
+
+def get_ordered_devices() -> tuple[list[str], list[str]]:
     devices = get_devices_name()
+    original_devices = devices.copy()
     change_order_devices(devices)
-    return devices
+    return devices, original_devices
+
 
 class MainPresenter:
     def __init__(self, ui, audio_AI, text_AI, ir):
@@ -78,6 +86,7 @@ class MainPresenter:
         informations_requested = self.text_AI.process_request(request=request)
         question = informations_requested["audio_text"]
         function = informations_requested["response"]
+        print(f"Question : {question}\n Fonction : {function}")
         match = re.match(r"(\w+)\((.*)\)", function)
         if try_count >= 3:
             delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
@@ -92,6 +101,7 @@ class MainPresenter:
             if args == "" or args is None:
                 # TODO: Gérer l exception si la méthode bug
                 data_result = method()
+                print(f"Data :  {data_result}")
                 delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
                 return {
                     "question": question,
@@ -140,11 +150,8 @@ class MainPresenter:
                     self.audio_AI.save_audio(recording_data)
                     processed = self.process(try_count=0)
                     response = self.text_AI.generate_response(processed["question"], processed["response"])
+                    print(f"Reponse : {response}")
                     asyncio.run(self.audio_AI.play_audio(response))
                 elif event.type == pygame.JOYBUTTONDOWN and event.button == get_key('.env', 'SECOND_BUTTON'):
                     threading.Thread(target=self.ir.thread_fuel_consumption).start()
-                pygame.time.wait(100)
-
-
-
-
+                pygame.time.wait(10)

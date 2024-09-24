@@ -1,4 +1,12 @@
+import asyncio
+import os
+import sys
+import threading
+import re
+import pygame
+from dotenv import get_key
 from AudioAI import AudioAI
+from TextAI import TextAI
 from IRacing import IRacing
 from MainPresenter import MainPresenter
 from TextAI import TextAI
