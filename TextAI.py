@@ -13,7 +13,7 @@ class TextAI:
         FR : Constructeur de la classe TextAI\n
         EN : Constructor of the TextAI class
         """
-        self.model = Groq(api_key=get_key('.env', 'GROQ_API_KEY'))
+        self.__model = Groq(api_key=get_key('.env', 'GROQ_API_KEY'))
 
     def process_request(self, request: str) -> dict:
         """
@@ -26,7 +26,7 @@ class TextAI:
             FR : Réponse de l'IA
             EN : AI response
         """
-        chat_completion = self.model.chat.completions.create(
+        chat_completion = self.__model.chat.completions.create(
             messages=[
                 {"role": "system", "content": get_key('.env', 'PROMPT_REQUEST')},
                 {"role": "user", "content": request}
@@ -54,7 +54,7 @@ class TextAI:
             FR : Réponse de l'IA
             EN : AI response
         """
-        chat_completion = self.model.chat.completions.create(
+        chat_completion = self.__model.chat.completions.create(
             messages=[
                 {"role": "system", "content": get_key('.env', 'PROMPT_RESPONSE')},
                 {"role": "user", "content": f"Question : {question}. Données de course : {data}"}

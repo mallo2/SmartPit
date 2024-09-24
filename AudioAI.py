@@ -19,7 +19,7 @@ class AudioAI:
         FR : Constructeur de la classe AudioAI\n
         EN : Constructor of the AudioAI
         """
-        self.model = whisper.load_model(get_key('.env', 'WHISPER_MODEL'))
+        self.__model = whisper.load_model(get_key('.env', 'WHISPER_MODEL'))
 
     @staticmethod
     def save_audio(recording_data, sample_rate=44100) -> None:
@@ -52,10 +52,10 @@ class AudioAI:
             EN : Input stream
         """
 
-        def callback(indata, _frames, _time, _status):
+        def __callback(indata, _frames, _time, _status):
             recording_data.append(indata.copy())
 
-        stream = sd.InputStream(callback=callback, channels=1, samplerate=sample_rate)
+        stream = sd.InputStream(callback=__callback, channels=1, samplerate=sample_rate)
         stream.start()
         return stream
 
@@ -97,5 +97,5 @@ class AudioAI:
             EN : Audio transcription
         """
         audio_file = get_key('.env', 'FILENAME_RECORD')
-        result = self.model.transcribe(audio_file)
+        result = self.__model.transcribe(audio_file)
         return result["text"]
