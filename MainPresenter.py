@@ -102,6 +102,8 @@ class MainPresenter:
                 # TODO: Gérer l exception si la méthode bug
                 data_result = method()
                 print(f"Data :  {data_result}")
+                if data_result is None:
+                    data_result = "Commande exécutée avec succès"
                 delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
                 return {
                     "question": question,
