@@ -13,7 +13,7 @@ class MainPresenter:
         FR : Constructeur de la classe\n
         EN : Constructor of the class
         """
-        self.__devices = self.__get_ordered_devices()
+        self.devices = self.__get_ordered_devices()
         self.__ui = ui
         self.__audio_AI = audio_AI
         self.__text_AI = text_AI
@@ -32,13 +32,6 @@ class MainPresenter:
         """
         if os.path.exists(filename):
             os.remove(filename)
-
-    @staticmethod
-    def __init_device_selected(idx: int):
-        pygame.init()
-        pygame.joystick.init()
-        joystick = pygame.joystick.Joystick(idx)
-        joystick.init()
 
     @staticmethod
     def __get_devices_name() -> list[str]:
@@ -137,7 +130,10 @@ class MainPresenter:
             :param idx:
             :return:
             """
-        self.__init_device_selected(idx)
+        pygame.init()
+        pygame.joystick.init()
+        joystick = pygame.joystick.Joystick(idx)
+        joystick.init()
         self.__audio_AI.play_welcome_sound()
         is_recording = False
         recording_data = []

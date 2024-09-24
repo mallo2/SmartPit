@@ -117,7 +117,7 @@ class UI(CTk):
         """
         logo = CTkImage(light_image=Image.open('ressources/images/logo.jpg'),
                         dark_image=Image.open('ressources/images/logo.jpg'), size=(150, 150))
-        title = CTkLabel(master=self.frame, text="", image=logo)
+        title = CTkLabel(master=self.__frame, text="", image=logo)
         title.pack(pady=12, padx=10)
 
     def __create_textbox(self) -> CTkEntry:
@@ -128,7 +128,7 @@ class UI(CTk):
             FR :
             EN :
         """
-        textbox = CTkEntry(self.frame, placeholder_text="GROQ API Key", height=25, width=250, border_width=1,
+        textbox = CTkEntry(self.__frame, placeholder_text="GROQ API Key", height=25, width=250, border_width=1,
                            border_color="white")
         textbox.pack(pady=20)
         self.__init_textbox(textbox)
@@ -142,7 +142,7 @@ class UI(CTk):
             FR :
             EN :
         """
-        dropdown = CTkComboBox(self.frame, state="readonly", width=300)
+        dropdown = CTkComboBox(self.__frame, state="readonly", width=300)
         dropdown.pack(pady=20)
         return dropdown
 
@@ -155,7 +155,7 @@ class UI(CTk):
         :param env_key:
         :return:
         """
-        frame = CTkFrame(master=self.frame, fg_color="#001a35")
+        frame = CTkFrame(master=self.__frame, fg_color="#001a35")
         frame.pack(pady=5)
         capture_textbox = CTkEntry(frame, height=30, width=50)
         capture_textbox.pack(side="left")
@@ -176,7 +176,7 @@ class UI(CTk):
             FR :
             EN :
         """
-        button = CTkButton(master=self.frame, text="Démarrer", command=self.__clicked, fg_color="#001a35",
+        button = CTkButton(master=self.__frame, text="Démarrer", command=self.__clicked, fg_color="#001a35",
                            border_color="white", border_width=1)
         button.pack(pady=25)
 
@@ -188,10 +188,10 @@ class UI(CTk):
             FR :
             EN :
         """
-        return [CTkLabel(master=self.frame, text="Veuillez entrer une clé API", fg_color="red", corner_radius=5),
-                CTkLabel(master=self.frame, text="Veuillez assigner une touche principale", fg_color="red",
+        return [CTkLabel(master=self.__frame, text="Veuillez entrer une clé API", fg_color="red", corner_radius=5),
+                CTkLabel(master=self.__frame, text="Veuillez assigner une touche principale", fg_color="red",
                          corner_radius=5),
-                CTkLabel(master=self.frame, text="Veuillez assigner une touche secondaire", fg_color="red",
+                CTkLabel(master=self.__frame, text="Veuillez assigner une touche secondaire", fg_color="red",
                          corner_radius=5)]
 
     def __is_valid_form(self) -> bool:
