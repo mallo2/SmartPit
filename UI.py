@@ -16,37 +16,21 @@ class UI(CTk):
         EN : Constructor of the UI class
         """
         super().__init__()
-        self.original_devices = None
-        self.devices = None
-        self.presenter: Optional[MainPresenter] = None
-        self.main = self.init_main(self)
-        self.frame = self.create_frame()
-        self.create_image()
-        self.textbox = self.create_textbox()
-        self.dropdown = self.create_dropdown()
-        self.main_button = self.create_button_textbox_frame("Assigner la touche principale", get_key('.env', 'MAIN_BUTTON'))
-        self.second_button = self.create_button_textbox_frame("Assigner la touche secondaire", get_key('.env', 'SECOND_BUTTON'))
-        self.create_button()
-        self.alert = self.create_alert()
-
-    def set_dropdown(self, devices):
-        self.dropdown.configure(values=devices)
-        self.dropdown.set(devices[0])
-
-    def set_presenter(self, presenter: MainPresenter):
-        """
-        FR : Méthode permettant de définir le présentateur\n
-        EN : Method to set the presenter
-        :param presenter:
-            FR :
-            EN :
-        """
-        self.presenter = presenter
-        self.devices, self.original_devices = presenter.devices
-        self.set_dropdown(self.devices)
+        self.__original_devices = None
+        self.__devices = None
+        self.__presenter: Optional[MainPresenter] = None
+        self.__main = self.__init_main(self)
+        self.__frame = self.__create_frame()
+        self.__create_image()
+        self.__textbox = self.__create_textbox()
+        self.__dropdown = self.__create_dropdown()
+        self.__main_button = self.__create_button_textbox_frame("Assigner la touche principale", get_key('.env', 'MAIN_BUTTON'))
+        self.__second_button = self.__create_button_textbox_frame("Assigner la touche secondaire", get_key('.env', 'SECOND_BUTTON'))
+        self.__create_button()
+        self.__alert = self.__create_alert()
 
     @staticmethod
-    def init_main(mainWindow):
+    def __init_main(mainWindow):
         """
         FR : Méthode permettant d'initialiser la fenêtre principale\n
         EN : Method to initialize the main window
@@ -60,7 +44,7 @@ class UI(CTk):
         return mainWindow
 
     @staticmethod
-    def init_textbox(textbox) -> None:
+    def __init_textbox(textbox) -> None:
         """
         FR : Méthode permettant d'initialiser le textbox pour la clé d'API de Groq\n
         EN : Method to initialize the textbox for the Groq API key
@@ -73,7 +57,7 @@ class UI(CTk):
             textbox.insert(0, groq_api_key)
 
     @staticmethod
-    def update_env_file(api_key, selected_device, main_button, second_button):
+    def __update_env_file(api_key, selected_device, main_button, second_button):
         """
         FR : Méthode permettant de mettre à jour le fichier .env après la validation de la pague d'acceuil\n
         EN : Method to update the .env file after the validation of the home page
@@ -88,18 +72,33 @@ class UI(CTk):
         set_key('.env', 'MAIN_BUTTON', main_button)
         set_key('.env', 'SECOND_BUTTON', second_button)
 
-    def clicked(self) -> None:
+    def __set_dropdown(self, devices):
+        self.__dropdown.configure(values=devices)
+        self.__dropdown.set(devices[0])
+
+    def __get_idx_device_selected(self) -> int:
+        """
+        FR : Méthode permettant de récupérer l'index du périphérique sélectionné\n
+        EN : Method to get the index of the selected device
+        :return:
+            FR :
+            EN :
+        """
+        self.__dropdown.configure(state="disabled")
+        return self.__original_devices.index(self.__dropdown.get())
+
+    def __clicked(self) -> None:
         """
         FR : Méthode appelée lors du clic sur le bouton de démarrage\n
         EN : Method called when clicking on the start button
         """
-        if self.is_valid_form():
-            self.update_env_file(self.textbox.get(), self.dropdown.get(), self.main_button.get(), self.second_button.get())
-            idx = self.get_idx_device_selected()
-            self.main.destroy()
-            self.presenter.launch_application(idx)
+        if self.__is_valid_form():
+            self.__update_env_file(self.__textbox.get(), self.__dropdown.get(), self.__main_button.get(), self.__second_button.get())
+            idx = self.__get_idx_device_selected()
+            self.__main.destroy()
+            self.__presenter.launch_application(idx)
 
-    def create_frame(self):
+    def __create_frame(self):
         """
         FR : Méthode permettant de créer un frame\n
         EN : Method to create a frame
@@ -107,11 +106,11 @@ class UI(CTk):
             FR :
             EN :
         """
-        frame = CTkFrame(master=self.main, fg_color="#001a35")
+        frame = CTkFrame(master=self.__main, fg_color="#001a35")
         frame.pack(pady=10, padx=30, fill="both", expand=True)
         return frame
 
-    def create_image(self) -> None:
+    def __create_image(self) -> None:
         """
         FR : Méthode permettant de créer l'image du logo\n
         EN : Method to create the logo image
@@ -121,7 +120,7 @@ class UI(CTk):
         title = CTkLabel(master=self.frame, text="", image=logo)
         title.pack(pady=12, padx=10)
 
-    def create_textbox(self) -> CTkEntry:
+    def __create_textbox(self) -> CTkEntry:
         """
         FR : Méthode permettant de créer le textbox pour la clé d'API de Groq\n
         EN : Method to create the textbox for the Groq API key
@@ -132,10 +131,10 @@ class UI(CTk):
         textbox = CTkEntry(self.frame, placeholder_text="GROQ API Key", height=25, width=250, border_width=1,
                            border_color="white")
         textbox.pack(pady=20)
-        self.init_textbox(textbox)
+        self.__init_textbox(textbox)
         return textbox
 
-    def create_dropdown(self):
+    def __create_dropdown(self):
         """
         FR : Méthode permettant de créer le dropdown pour la sélection du périphérique\n
         EN : Method to create the dropdown for the device selection
@@ -147,7 +146,7 @@ class UI(CTk):
         dropdown.pack(pady=20)
         return dropdown
 
-    def create_button_textbox_frame(self, text, env_key):
+    def __create_button_textbox_frame(self, text, env_key):
         # TODO : Finir documentation
         """
         FR : Méthode permettant de créer un frame avec un textbox et un bouton pour l'assignation de touche\n
@@ -162,14 +161,14 @@ class UI(CTk):
         capture_textbox.pack(side="left")
 
         capture_textbox.insert(0, env_key)
-        button = CTkButton(frame, text=text, command=partial(self.detect_key, capture_textbox))
+        button = CTkButton(frame, text=text, command=partial(self.__detect_key, capture_textbox))
 
         capture_textbox.configure(state="readonly")
         button.pack(side="left", padx=5)
 
         return capture_textbox
 
-    def create_button(self) -> None:
+    def __create_button(self) -> None:
         """
         FR : Méthode permettant de créer le bouton de démarrage et de validation du formulaire\n
         EN : Method to create the start button and validate the form
@@ -177,11 +176,11 @@ class UI(CTk):
             FR :
             EN :
         """
-        button = CTkButton(master=self.frame, text="Démarrer", command=self.clicked, fg_color="#001a35",
+        button = CTkButton(master=self.frame, text="Démarrer", command=self.__clicked, fg_color="#001a35",
                            border_color="white", border_width=1)
         button.pack(pady=25)
 
-    def create_alert(self) -> list[CTkLabel]:
+    def __create_alert(self) -> list[CTkLabel]:
         """
         FR : Méthode permettant de créer les alertes\n
         EN : Method to create alerts
@@ -195,7 +194,7 @@ class UI(CTk):
                 CTkLabel(master=self.frame, text="Veuillez assigner une touche secondaire", fg_color="red",
                          corner_radius=5)]
 
-    def is_valid_form(self) -> bool:
+    def __is_valid_form(self) -> bool:
         """
         FR : Méthode permettant de valider le formulaire\n
         EN : Method to validate the form
@@ -204,18 +203,18 @@ class UI(CTk):
             EN :
         """
         valid = True
-        if self.textbox.get() == "":
-            self.alert[0].pack(pady=2)
+        if self.__textbox.get() == "":
+            self.__alert[0].pack(pady=2)
             valid = False
-        if self.main_button.get() == "":
-            self.alert[1].pack(pady=2)
+        if self.__main_button.get() == "":
+            self.__alert[1].pack(pady=2)
             valid = False
-        if self.second_button.get() == "":
-            self.alert[2].pack(pady=2)
+        if self.__second_button.get() == "":
+            self.__alert[2].pack(pady=2)
             valid = False
         return valid
 
-    def detect_key(self, capture_textbox):
+    def __detect_key(self, capture_textbox):
         # TODO : Finir documentation
         """
         FR : Méthode permettant de détecter la touche appuyée\n
@@ -223,9 +222,9 @@ class UI(CTk):
         :param capture_textbox:
         :return:
         """
-        self.dropdown.configure(state="disabled")
+        self.__dropdown.configure(state="disabled")
         start_time = time.time()
-        joystick = pygame.joystick.Joystick(self.get_idx_device_selected())
+        joystick = pygame.joystick.Joystick(self.__get_idx_device_selected())
         joystick.init()
         while True:
             if time.time() - start_time > 7.5:
@@ -238,15 +237,16 @@ class UI(CTk):
                     capture_textbox.configure(state="readonly")
                     return
             pygame.time.wait(100)
-        self.dropdown.configure(state="normal")
+        self.__dropdown.configure(state="normal")
 
-    def get_idx_device_selected(self) -> int:
+    def set_presenter(self, presenter: MainPresenter):
         """
-        FR : Méthode permettant de récupérer l'index du périphérique sélectionné\n
-        EN : Method to get the index of the selected device
-        :return:
+        FR : Méthode permettant de définir le présentateur\n
+        EN : Method to set the presenter
+        :param presenter:
             FR :
             EN :
         """
-        self.dropdown.configure(state="disabled")
-        return self.original_devices.index(self.dropdown.get())
+        self.__presenter = presenter
+        self.__devices, self.__original_devices = presenter.devices
+        self.__set_dropdown(self.__devices)
