@@ -4,44 +4,59 @@ from functools import partial
 from PIL import Image
 from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkEntry, CTkComboBox, CTkButton
 from dotenv import set_key, get_key
+from customtkinter import CTk
+from typing import Optional
+from MainPresenter import MainPresenter
 
 
-class UI:
-    def __init__(self, smartPit, devices: list[str]):
+class UI(CTk):
+    def __init__(self):
         """
         FR : Constructeur de la classe UI\n
         EN : Constructor of the UI class
-        :param smartPit:
-            FR :
-            EN :
-        :param devices:
-            FR :
-            EN :
         """
-        self.devices = devices
-        self.main = self.init_main(smartPit)
+        super().__init__()
+        self.devices = None
+        self.presenter: Optional[MainPresenter] = None
+        self.main = self.init_main(self)
         self.frame = self.create_frame()
         self.create_image()
         self.textbox = self.create_textbox()
-        self.dropdown = self.create_dropdown(devices)
+        self.dropdown = self.create_dropdown()
         self.main_button = self.create_button_textbox_frame("Assigner la touche principale", get_key('.env', 'MAIN_BUTTON'))
         self.second_button = self.create_button_textbox_frame("Assigner la touche secondaire", get_key('.env', 'SECOND_BUTTON'))
         self.create_button()
         self.alert = self.create_alert()
 
+    def set_dropdown(self, devices):
+        self.dropdown.configure(values=devices)
+        self.dropdown.set(devices[0])
+
+    def set_presenter(self, presenter: MainPresenter):
+        """
+        FR : Méthode permettant de définir le présentateur\n
+        EN : Method to set the presenter
+        :param presenter:
+            FR :
+            EN :
+        """
+        self.presenter = presenter
+        self.devices = presenter.devices
+        self.set_dropdown(self.devices)
+
     @staticmethod
-    def init_main(smartPit):
+    def init_main(mainWindow):
         """
         FR : Méthode permettant d'initialiser la fenêtre principale\n
         EN : Method to initialize the main window
-        :param smartPit:
+        :param mainWindow:
         :return:
         """
-        smartPit.title("SmartPit")
-        smartPit.geometry("800x600")
-        smartPit.resizable(False, False)
-        smartPit.iconbitmap('ressources/images/favicon.ico')
-        return smartPit
+        mainWindow.title("SmartPit")
+        mainWindow.geometry("800x600")
+        mainWindow.resizable(False, False)
+        mainWindow.iconbitmap('ressources/images/favicon.ico')
+        return mainWindow
 
     @staticmethod
     def init_textbox(textbox) -> None:
@@ -77,12 +92,11 @@ class UI:
         FR : Méthode appelée lors du clic sur le bouton de démarrage\n
         EN : Method called when clicking on the start button
         """
-        from SmartPit import launch_application
         if self.is_valid_form():
             self.update_env_file(self.textbox.get(), self.dropdown.get(), self.main_button.get(), self.second_button.get())
-            idx = self.devices.index(self.dropdown.get())
+            idx = self.get_idx_device_selected()
             self.main.destroy()
-            launch_application(idx)
+            self.presenter.launch_application(idx)
 
     def create_frame(self):
         """
@@ -120,19 +134,15 @@ class UI:
         self.init_textbox(textbox)
         return textbox
 
-    def create_dropdown(self, devices: list[str]):
+    def create_dropdown(self):
         """
         FR : Méthode permettant de créer le dropdown pour la sélection du périphérique\n
         EN : Method to create the dropdown for the device selection
-        :param devices:
-            FR :
-            EN :
         :return:
             FR :
             EN :
         """
-        dropdown = CTkComboBox(self.frame, values=devices, state="readonly", width=300)
-        dropdown.set(devices[0])
+        dropdown = CTkComboBox(self.frame, state="readonly", width=300)
         dropdown.pack(pady=20)
         return dropdown
 
