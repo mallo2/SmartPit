@@ -22,7 +22,7 @@ class AudioAI:
         self.__model = whisper.load_model(get_key('.env', 'WHISPER_MODEL'))
 
     @staticmethod
-    def save_audio(recording_data, sample_rate=44100) -> None:
+    def save_audio(recording_data: list, sample_rate=44100) -> None:
         """
         FR : Méthode permettant d'écrire le fichier audio sur base de l'enregistrement\n
         EN : Method to write the audio file based on the recording\n
@@ -70,7 +70,7 @@ class AudioAI:
         pygame.mixer.music.play()
 
     @staticmethod
-    async def play_audio(message) -> None:
+    async def play_audio(message: str) -> None:
         """
         FR : Méthode permettant de jouer un message audio\n
         EN : Method to play an audio message\n

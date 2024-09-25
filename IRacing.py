@@ -142,7 +142,6 @@ class IRacing:
         """
         FR : Méthode permettant de se connecter à IRacing\n
         EN : Method to connect to IRacing
-        :return:
         """
         self.__ir.startup()
         if not self.__ir.is_initialized:
@@ -168,7 +167,7 @@ class IRacing:
         """
         FR : Méthode permettant de récupérer la position de l'utilisateur\n
         EN : Method to get the user's position
-        :return: str
+        :return: (str)
             FR : Position de l'utilisateur
             EN : User's position
         """

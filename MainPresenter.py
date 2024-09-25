@@ -6,14 +6,30 @@ import re
 import pygame
 from dotenv import get_key
 
+from AudioAI import AudioAI
+from IRacing import IRacing
 from IRacingError import IRacingError
+from TextAI import TextAI
+from UI import UI
 
 
 class MainPresenter:
-    def __init__(self, ui, audio_AI, text_AI, ir):
+    def __init__(self, ui: UI, audio_AI: AudioAI, text_AI: TextAI, ir: IRacing):
         """
-        FR : Constructeur de la classe\n
-        EN : Constructor of the class
+        FR : Constructeur de la classe MainPresenter\n
+        EN : Constructor of the MainPresenter class
+        :param ui:  (UI)
+            FR : Interface utilisateur\n
+            EN : User interface
+        :param audio_AI: (AudioAI)
+            FR : Intelligence artificielle audio\n
+            EN : Audio artificial intelligence
+        :param text_AI: (TextAI)
+            FR : Intelligence artificielle textuelle\n
+            EN : Textual artificial intelligence
+        :param ir: (IRacing)
+            FR : Objet permettant de communiquer avec iRacing\n
+            EN : Object allowing to communicate with iRacing
         """
         self.devices = self.__get_ordered_devices()
         self.__ui = ui
@@ -25,12 +41,13 @@ class MainPresenter:
         self.__ui.mainloop()
 
     @staticmethod
-    def __delete_file_if_exists(filename):
+    def __delete_file_if_exists(filename:str) -> None:
         """
         FR : Méthode permettant de supprimer un fichier s'il existe\n
         EN : Method to delete a file if it exists
         :param filename:
-        :return:
+            FR : Nom du fichier\n
+            EN : Name of the file
         """
         if os.path.exists(filename):
             os.remove(filename)
@@ -41,6 +58,8 @@ class MainPresenter:
         FR : Méthode permettant de récupérer les noms des périphériques de jeu\n
         EN : Method to get the names of the game devices
         :return:
+            FR : Liste contenant les noms des périphériques de jeu\n
+            EN : List containing the names of the game devices
         """
         names = []
         pygame.init()
@@ -55,12 +74,13 @@ class MainPresenter:
         return names
 
     @staticmethod
-    def __change_order_devices(devices) -> None:
+    def __change_order_devices(devices: list[str]) -> None:
         """
         FR : Méthode permettant de changer l'ordre des devices en placant le périphérique sélectionné en premier\n
         EN : Method to change the order of the devices by placing the selected device first
-        :param devices:
-        :return:
+        :param devices: (list[str])
+            FR : Liste des périphériques de jeu\n
+            EN : List of game devices
         """
         selected_device = get_key('.env', 'SELECTED_DEVICE')
         if selected_device and selected_device != "" and selected_device in devices:
@@ -68,18 +88,28 @@ class MainPresenter:
             devices.insert(0, selected_device)
 
     def __get_ordered_devices(self) -> tuple[list[str], list[str]]:
+        """
+        FR : Méthode permettant de récupérer les périphériques de jeu ordonnés\n
+        EN : Method to get the ordered game devices
+        :return:
+            FR : Tuple contenant les périphériques de jeu ordonnés et les périphériques de jeu originaux\n
+            EN : Tuple containing the ordered game devices and the original game devices
+        """
         devices = self.__get_devices_name()
         original_devices = devices.copy()
         self.__change_order_devices(devices)
         return devices, original_devices
 
-    def __process(self, try_count: int):
+    def __process(self, try_count: int) -> dict:
         """
         FR : Méthode permettant de traiter la demande\n
         EN : Method to process the request
-
-        :param try_count:
+        :param try_count: (int)
+            FR : Nombre de tentatives\n
+            EN : Number of attempts
         :return:
+            FR : Dictionnaire contenant la question et la réponse\n
+            EN : Dictionary containing the question and the answer
         """
         request = self.__audio_AI.transcribe_audio()
         informations_requested = self.__text_AI.process_request(request=request)
@@ -127,8 +157,9 @@ class MainPresenter:
         """
             FR : Méthode permettant de lancer l'application\n
             EN : Method to launch the application
-            :param idx:
-            :return:
+            :param idx: (int)
+                FR : Index du périphérique de jeu\n
+                EN : Index of the game device
             """
         pygame.init()
         pygame.joystick.init()
