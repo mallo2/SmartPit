@@ -161,41 +161,39 @@ class MainPresenter:
                 FR : Index du périphérique de jeu\n
                 EN : Index of the game device
             """
-        pygame.init()
-        pygame.joystick.init()
-        joystick = pygame.joystick.Joystick(idx)
-        joystick.init()
-        self.__audio_AI.play_welcome_sound()
-        try:
+        try :
+            pygame.init()
+            pygame.joystick.init()
+            joystick = pygame.joystick.Joystick(idx)
+            joystick.init()
+            self.__audio_AI.play_welcome_sound()
             self.__ir.connect()
-        except IRacingError as e:
-            print(e)
-            # TODO : Afficher message d'erreur
-            return
-        is_recording = False
-        recording_data = []
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.JOYBUTTONDOWN and event.button == int(
-                        get_key('.env', 'MAIN_BUTTON')) and not is_recording:
-                    print("Début de l'enregistrement")
-                    self.__delete_file_if_exists(get_key('.env', 'RESPONSE_FILENAME'))
-                    recording_data = []
-                    stream = self.__audio_AI.record_audio(recording_data)
-                    is_recording = True
+            is_recording = False
+            recording_data = []
+            while True:
+                for event in pygame.event.get():
+                    if event.type == pygame.JOYBUTTONDOWN and event.button == int(
+                            get_key('.env', 'MAIN_BUTTON')) and not is_recording:
+                        print("Début de l'enregistrement")
+                        self.__delete_file_if_exists(get_key('.env', 'RESPONSE_FILENAME'))
+                        recording_data = []
+                        stream = self.__audio_AI.record_audio(recording_data)
+                        is_recording = True
 
-                elif event.type == pygame.JOYBUTTONUP and event.button == int(
-                        get_key('.env', 'MAIN_BUTTON')) and is_recording:
-                    stream.stop()
-                    stream.close()
-                    is_recording = False
-                    self.__audio_AI.save_audio(recording_data)
-                    processed = self.__process(try_count=0)
-                    response = self.__text_AI.generate_response(processed["question"], processed["response"])
-                    print(f"Reponse : {response}")
-                    asyncio.run(self.__audio_AI.play_audio(response))
+                    elif event.type == pygame.JOYBUTTONUP and event.button == int(
+                            get_key('.env', 'MAIN_BUTTON')) and is_recording:
+                        stream.stop()
+                        stream.close()
+                        is_recording = False
+                        self.__audio_AI.save_audio(recording_data)
+                        processed = self.__process(try_count=0)
+                        response = self.__text_AI.generate_response(processed["question"], processed["response"])
+                        print(f"Reponse : {response}")
+                        asyncio.run(self.__audio_AI.play_audio(response))
 
-                elif event.type == pygame.JOYBUTTONDOWN and event.button == get_key('.env', 'SECOND_BUTTON'):
-                    threading.Thread(target=self.__ir.thread_fuel_consumption).start()
+                    elif event.type == pygame.JOYBUTTONDOWN and event.button == get_key('.env', 'SECOND_BUTTON'):
+                        threading.Thread(target=self.__ir.thread_fuel_consumption).start()
 
-                pygame.time.wait(10)
+                    pygame.time.wait(10)
+        except Exception as e:
+            self.__ui.show_error_shutdown(str(e))

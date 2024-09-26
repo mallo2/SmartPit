@@ -7,6 +7,7 @@ from dotenv import set_key, get_key
 from customtkinter import CTk
 from typing import Optional
 from MainPresenter import MainPresenter
+from tkinter import messagebox
 
 
 class UI(CTk):
@@ -270,3 +271,6 @@ class UI(CTk):
         self.__presenter = presenter
         self.__devices, self.__original_devices = presenter.devices
         self.__set_dropdown(self.__devices)
+
+    def show_error_shutdown(self, error: str) -> None:
+        messagebox.showerror("Erreur d'exécution", error)
