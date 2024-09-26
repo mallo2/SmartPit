@@ -1,3 +1,5 @@
+import logging
+
 import irsdk
 from asyncio import sleep
 from Converter import DataConverter
@@ -16,6 +18,7 @@ class IRacing:
         EN : Constructor of the IRacing class
         """
         self.__ir = irsdk.IRSDK()
+        logging.info("IRacing class initialized")
 
     def __idx_of_behind_player(self) -> int:
         """
@@ -161,7 +164,7 @@ class IRacing:
             repetition += 1
             average_fuel_consumption_by_second = fuel_consumption_by_hour / repetition / 3600
             sleep(0.1)
-        print("Fin de la course")
+        logging.info("Race is over")
 
     def my_position(self) -> str:
         """

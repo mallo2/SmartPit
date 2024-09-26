@@ -1,3 +1,4 @@
+import logging
 import time
 import pygame
 from functools import partial
@@ -5,8 +6,6 @@ from PIL import Image
 from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkEntry, CTkComboBox, CTkButton
 from dotenv import set_key, get_key
 from customtkinter import CTk
-from typing import Optional
-from MainPresenter import MainPresenter
 from tkinter import messagebox
 
 
@@ -19,7 +18,7 @@ class UI(CTk):
         super().__init__()
         self.__original_devices = None
         self.__devices = None
-        self.__presenter: Optional[MainPresenter] = None
+        self.__presenter = None
         self.__main = self.__init_main(self)
         self.__frame = self.__create_frame()
         self.__create_image()
@@ -29,6 +28,7 @@ class UI(CTk):
         self.__second_button = self.__create_button_textbox_frame("Assigner la touche secondaire", get_key('.env', 'SECOND_BUTTON'))
         self.__create_button()
         self.__alert = self.__create_alert()
+        logging.info("UI initialized")
 
     @staticmethod
     def __init_main(mainWindow):
@@ -113,8 +113,10 @@ class UI(CTk):
         """
         if self.__is_valid_form():
             self.__update_env_file(self.__textbox.get(), self.__dropdown.get(), self.__main_button.get(), self.__second_button.get())
+            logging.info("Environment file updated")
             idx = self.__get_idx_device_selected()
             self.__main.destroy()
+            logging.info("Main window destroyed")
             self.__presenter.launch_application(idx)
 
     def __create_frame(self) -> CTkFrame:
@@ -260,7 +262,7 @@ class UI(CTk):
             pygame.time.wait(100)
         self.__dropdown.configure(state="normal")
 
-    def set_presenter(self, presenter: MainPresenter) -> None:
+    def set_presenter(self, presenter) -> None:
         """
         FR : Méthode permettant de définir la classe presenter \n
         EN : Method to set the presenter
@@ -272,5 +274,14 @@ class UI(CTk):
         self.__devices, self.__original_devices = presenter.devices
         self.__set_dropdown(self.__devices)
 
-    def show_error_shutdown(self, error: str) -> None:
+    @staticmethod
+    def show_error_shutdown(error: str) -> None:
+        """
+        FR : Méthode statique permettant d'afficher une erreur\n
+        EN : Static method to display an error
+        :param error: (str)
+            FR : Erreur à afficher
+            EN : Error to display
+        """
+        logging.critical(error)
         messagebox.showerror("Erreur d'exécution", error)

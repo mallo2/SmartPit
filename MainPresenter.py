@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 import sys
 import threading
@@ -39,6 +40,7 @@ class MainPresenter:
 
         self.__ui.set_presenter(self)
         self.__ui.mainloop()
+        logging.info("MainPresenter initialized")
 
     @staticmethod
     def __delete_file_if_exists(filename:str) -> None:
@@ -65,8 +67,8 @@ class MainPresenter:
         pygame.init()
         pygame.joystick.init()
         if pygame.joystick.get_count() == 0:
-            print("Aucun périphérique de jeu connecté.")
-            sys.exit()
+            logging.critical("No game device connected")
+            raise Exception("No game device connected")
         for i in range(pygame.joystick.get_count()):
             joystick = pygame.joystick.Joystick(i)
             joystick.init()
@@ -115,7 +117,8 @@ class MainPresenter:
         informations_requested = self.__text_AI.process_request(request=request)
         question = informations_requested["audio_text"]
         function = informations_requested["response"]
-        print(f"Question : {question}\n Fonction : {function}")
+        logging.info(f"Question : {question}")
+        logging.info(f"Fonction : {function}")
         match = re.match(r"(\w+)\((.*)\)", function)
 
         if try_count >= 3:
@@ -131,7 +134,7 @@ class MainPresenter:
             method = getattr(self.__ir, method_name)
             if args == "" or args is None:
                 data_result = method()
-                print(f"Data :  {data_result}")
+                logging.info(f"Data : {data_result}")
                 if data_result is None:
                     data_result = "Commande exécutée avec succès"
                 self.__delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
@@ -150,7 +153,7 @@ class MainPresenter:
 
         else:
             try_count += 1
-            print("Format de chaîne invalide")
+            logging.warning("Invalid string format")
             return self.__process(try_count=try_count)
 
     def launch_application(self, idx):
@@ -161,6 +164,7 @@ class MainPresenter:
                 FR : Index du périphérique de jeu\n
                 EN : Index of the game device
             """
+        logging.info("Application launched")
         try :
             pygame.init()
             pygame.joystick.init()
@@ -168,29 +172,33 @@ class MainPresenter:
             joystick.init()
             self.__audio_AI.play_welcome_sound()
             self.__ir.connect()
+            logging.info("Application connected to iRacing")
             is_recording = False
             recording_data = []
             while True:
                 for event in pygame.event.get():
                     if event.type == pygame.JOYBUTTONDOWN and event.button == int(
                             get_key('.env', 'MAIN_BUTTON')) and not is_recording:
-                        print("Début de l'enregistrement")
+                        logging.info("Recording started")
                         self.__delete_file_if_exists(get_key('.env', 'RESPONSE_FILENAME'))
                         recording_data = []
                         stream = self.__audio_AI.record_audio(recording_data)
                         is_recording = True
-
                     elif event.type == pygame.JOYBUTTONUP and event.button == int(
                             get_key('.env', 'MAIN_BUTTON')) and is_recording:
+                        logging.info("Recording stopped")
                         stream.stop()
                         stream.close()
                         is_recording = False
                         self.__audio_AI.save_audio(recording_data)
+                        logging.info("Audio saved")
                         processed = self.__process(try_count=0)
+                        logging.info(f"Question : {processed['question']}")
+                        logging.info(f"Réponse : {processed['response']}")
                         response = self.__text_AI.generate_response(processed["question"], processed["response"])
-                        print(f"Reponse : {response}")
+                        logging.info(f"Réponse IA : {response}")
                         asyncio.run(self.__audio_AI.play_audio(response))
-
+                        logging.info("Audio played")
                     elif event.type == pygame.JOYBUTTONDOWN and event.button == get_key('.env', 'SECOND_BUTTON'):
                         threading.Thread(target=self.__ir.thread_fuel_consumption).start()
 

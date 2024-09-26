@@ -1,3 +1,5 @@
+import logging
+
 from dotenv import get_key
 from groq import Groq
 
@@ -14,6 +16,7 @@ class TextAI:
         EN : Constructor of the TextAI class
         """
         self.__model = Groq(api_key=get_key('.env', 'GROQ_API_KEY'))
+        logging.info("TextAI initialized")
 
     def process_request(self, request: str) -> dict:
         """
@@ -62,5 +65,4 @@ class TextAI:
             model=get_key('.env', 'GROQ_MODEL_RESPONSE'),
             temperature=0.5
         )
-        print(f"Réponse IA: {chat_completion.choices[0].message.content}")
         return chat_completion.choices[0].message.content

@@ -1,3 +1,4 @@
+import logging
 import time
 import edge_tts
 import pygame
@@ -20,6 +21,7 @@ class AudioAI:
         EN : Constructor of the AudioAI
         """
         self.__model = whisper.load_model(get_key('.env', 'WHISPER_MODEL'))
+        logging.info("Audio AI initialized")
 
     @staticmethod
     def save_audio(recording_data: list, sample_rate=44100) -> None:
