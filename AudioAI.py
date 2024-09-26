@@ -34,7 +34,7 @@ class AudioAI:
             EN : Sampling frequency
         """
         audio_array = np.concatenate(recording_data, axis=0)
-        wavio.write(get_key('.env', 'FILENAME_RECORD'), audio_array, sample_rate, sampwidth=2)
+        wavio.write(get_key('.env', 'PATH_FILE_RECORD'), audio_array, sample_rate, sampwidth=2)
 
     @staticmethod
     def record_audio(recording_data: list, sample_rate=44100) -> sd.InputStream:
@@ -66,7 +66,7 @@ class AudioAI:
         EN : Method to play the welcome message\n
         """
         pygame.mixer.init()
-        pygame.mixer.music.load("ressources/sounds/welcome_message.mp3")
+        pygame.mixer.music.load(get_key('.env', 'PATH_FILE_WELCOME'))
         pygame.mixer.music.play()
 
     @staticmethod
@@ -79,9 +79,9 @@ class AudioAI:
             EN : Message to read
         """
         tts = edge_tts.Communicate(message, voice=get_key('.env', 'SPEECH_VOICE'))
-        await tts.save(get_key('.env', 'RESPONSE_FILENAME'))
+        await tts.save(get_key('.env', 'PATH_FILE_RESPONSE'))
         pygame.mixer.init()
-        pygame.mixer.music.load(get_key('.env', 'RESPONSE_FILENAME'))
+        pygame.mixer.music.load(get_key('.env', 'PATH_FILE_RESPONSE'))
         pygame.mixer.music.play()
         while pygame.mixer.music.get_busy():
             time.sleep(1)
@@ -96,6 +96,6 @@ class AudioAI:
             FR : Transcription de l'audio
             EN : Audio transcription
         """
-        audio_file = get_key('.env', 'FILENAME_RECORD')
+        audio_file = get_key('.env', 'PATH_FILE_RECORD')
         result = self.__model.transcribe(audio_file)
         return result["text"]
