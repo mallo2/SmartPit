@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import sys
 import threading
 import re
 import pygame
@@ -119,7 +120,7 @@ class MainPresenter:
         match = re.match(r"(\w+)\((.*)\)", function)
 
         if try_count >= 3:
-            self.__delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
+            self.__delete_file_if_exists(get_key('.env', 'PATH_FILE_RECORD'))
             return {
                 "question": question,
                 "response": "Je n'ai pas compris votre demande"
@@ -134,7 +135,7 @@ class MainPresenter:
                 logging.info(f"Data : {data_result}")
                 if data_result is None:
                     data_result = "Commande exécutée avec succès"
-                self.__delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
+                self.__delete_file_if_exists(get_key('.env', 'PATH_FILE_RECORD'))
                 return {
                     "question": question,
                     "response": data_result
@@ -142,7 +143,7 @@ class MainPresenter:
 
             arg_values = [eval(arg.strip()) for arg in args.split(',')]
             data_result = method(*arg_values)
-            self.__delete_file_if_exists(get_key('.env', 'FILENAME_RECORD'))
+            self.__delete_file_if_exists(get_key('.env', 'PATH_FILE_RECORD'))
             return {
                 "question": question,
                 "response": data_result
@@ -177,7 +178,7 @@ class MainPresenter:
                     if event.type == pygame.JOYBUTTONDOWN and event.button == int(
                             get_key('.env', 'MAIN_BUTTON')) and not is_recording:
                         logging.info("Recording started")
-                        self.__delete_file_if_exists(get_key('.env', 'RESPONSE_FILENAME'))
+                        self.__delete_file_if_exists(get_key('.env', 'PATH_FILE_RESPONSE'))
                         recording_data = []
                         stream = self.__audio_AI.record_audio(recording_data)
                         is_recording = True
@@ -202,3 +203,4 @@ class MainPresenter:
                     pygame.time.wait(10)
         except Exception as e:
             self.__ui.show_error_shutdown(str(e))
+            sys.exit()
