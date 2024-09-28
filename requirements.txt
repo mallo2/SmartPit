@@ -9,3 +9,4 @@ groq
 customtkinter
 Pillow
 edge-tts
+pystray
