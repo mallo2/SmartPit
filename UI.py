@@ -11,7 +11,6 @@ from PIL import Image, ImageDraw
 import threading
 
 
-
 class UI(CTk):
     def __init__(self):
         """
@@ -28,8 +27,10 @@ class UI(CTk):
         self.__create_image()
         self.__textbox = self.__create_textbox()
         self.__dropdown = self.__create_dropdown()
-        self.__main_button = self.__create_button_textbox_frame("Assigner la touche principale", get_key('.env', 'MAIN_BUTTON'))
-        self.__second_button = self.__create_button_textbox_frame("Assigner la touche secondaire", get_key('.env', 'SECOND_BUTTON'))
+        self.__main_button = self.__create_button_textbox_frame("Assigner la touche principale",
+                                                                get_key('.env', 'MAIN_BUTTON'))
+        self.__second_button = self.__create_button_textbox_frame("Assigner la touche secondaire",
+                                                                  get_key('.env', 'SECOND_BUTTON'))
         self.__create_button()
         self.__alert = self.__create_alert()
         logging.info("UI initialized")
@@ -53,7 +54,7 @@ class UI(CTk):
         return mainWindow
 
     @staticmethod
-    def __init_textbox(textbox : CTkEntry) -> None:
+    def __init_textbox(textbox: CTkEntry) -> None:
         """
         FR : Méthode permettant d'initialiser le textbox pour la clé d'API de Groq\n
         EN : Method to initialize the textbox for the Groq API key
@@ -66,7 +67,7 @@ class UI(CTk):
             textbox.insert(0, groq_api_key)
 
     @staticmethod
-    def __update_env_file(api_key: str, selected_device:str, main_button: str, second_button: str) -> None:
+    def __update_env_file(api_key: str, selected_device: str, main_button: str, second_button: str) -> None:
         """
         FR : Méthode privée permettant de mettre à jour le fichier .env après la validation de la pague d'acceuil\n
         EN : Private method to update the .env file after the validation of the home page
@@ -116,7 +117,8 @@ class UI(CTk):
         EN : Private method called when clicking on the start button
         """
         if self.__is_valid_form():
-            self.__update_env_file(self.__textbox.get(), self.__dropdown.get(), self.__main_button.get(), self.__second_button.get())
+            self.__update_env_file(self.__textbox.get(), self.__dropdown.get(), self.__main_button.get(),
+                                   self.__second_button.get())
             logging.info("Environment file updated")
             idx = self.__get_idx_device_selected()
             self.__main.destroy()
@@ -171,7 +173,7 @@ class UI(CTk):
         dropdown.pack(pady=20)
         return dropdown
 
-    def __create_button_textbox_frame(self, text: str, env_key:str) -> CTkEntry:
+    def __create_button_textbox_frame(self, text: str, env_key: str) -> CTkEntry:
         """
         FR : Méthode privée permettant de créer un frame avec un textbox et un bouton pour l'assignation de touche\n
         EN : Private method to create a frame with a textbox and a button for key assignment
@@ -291,7 +293,7 @@ class UI(CTk):
         messagebox.showerror("Erreur d'exécution", error)
 
     @staticmethod
-    def __quit_app(icon)-> None:
+    def __quit_app(icon) -> None:
         """
         FR : Méthode statique permettant de quitter l'application\n
         EN : Static method to quit the application
@@ -302,7 +304,7 @@ class UI(CTk):
         logging.info("Application closed")
         icon.stop()
 
-    def __setup_tray(self)-> None:
+    def __setup_tray(self) -> None:
         """
         FR : Méthode permettant de configurer le systray\n
         EN : Method to configure the systray

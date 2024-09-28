@@ -30,6 +30,8 @@ class MainPresenter:
             FR : Objet permettant de communiquer avec iRacing\n
             EN : Object allowing to communicate with iRacing
         """
+        self.__lock_file = "smartpit.lock"
+        self.__create_lock_file()
         self.devices = self.__get_ordered_devices()
         self.__ui = ui
         self.__audio_AI = audio_AI
@@ -86,6 +88,25 @@ class MainPresenter:
         if selected_device and selected_device != "" and selected_device in devices:
             devices.remove(selected_device)
             devices.insert(0, selected_device)
+
+    def __stop_application(self, error: str) -> None:
+        """
+        FR : Méthode permettant d'arrêter l'application\n
+        EN : Method to stop the application
+        :param error: (str)
+            FR : Message d'erreur\n
+            EN : Error message
+        """
+        self.__ui.show_error_shutdown(error)
+        self.__delete_file_if_exists(self.__lock_file)
+        sys.exit()
+
+    def __create_lock_file(self):
+        if os.path.exists(self.__lock_file):
+            self.__stop_application("Application already running")
+        else:
+            with open(self.__lock_file, 'w') as lock_file:
+                lock_file.write(str(os.getpid()))
 
     def __get_ordered_devices(self) -> tuple[list[str], list[str]]:
         """
@@ -202,5 +223,4 @@ class MainPresenter:
 
                     pygame.time.wait(10)
         except Exception as e:
-            self.__ui.show_error_shutdown(str(e))
-            sys.exit()
+            self.__stop_application(str(e))
