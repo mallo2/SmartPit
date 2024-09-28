@@ -2,11 +2,14 @@ import logging
 import time
 import pygame
 from functools import partial
-from PIL import Image
 from customtkinter import CTkFrame, CTkImage, CTkLabel, CTkEntry, CTkComboBox, CTkButton
 from dotenv import set_key, get_key
 from customtkinter import CTk
 from tkinter import messagebox
+from pystray import Icon, MenuItem, Menu
+from PIL import Image, ImageDraw
+import threading
+
 
 
 class UI(CTk):
@@ -16,6 +19,7 @@ class UI(CTk):
         EN : Constructor of the UI class
         """
         super().__init__()
+        threading.Thread(target=self.__setup_tray, daemon=True).start()
         self.__original_devices = None
         self.__devices = None
         self.__presenter = None
@@ -285,3 +289,30 @@ class UI(CTk):
         """
         logging.critical(error)
         messagebox.showerror("Erreur d'exécution", error)
+
+    @staticmethod
+    def __quit_app(icon)-> None:
+        """
+        FR : Méthode statique permettant de quitter l'application\n
+        EN : Static method to quit the application
+        :param icon: (Icon)
+            FR : Icône de l'application
+            EN : Application icon
+        """
+        logging.info("Application closed")
+        icon.stop()
+
+    def __setup_tray(self)-> None:
+        """
+        FR : Méthode permettant de configurer le systray\n
+        EN : Method to configure the systray
+        """
+        icon_image = Image.open("ressources/images/favicon.ico")
+
+        menu = Menu(
+            MenuItem('Quitter', self.__quit_app)
+        )
+
+        # Créer l'icône dans la systray
+        icon = Icon("SmartPit", icon_image, "SmartPit", menu)
+        icon.run()

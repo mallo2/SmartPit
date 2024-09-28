@@ -14,8 +14,8 @@ if __name__ == "__main__":
                             logging.FileHandler("app.log"),
                             logging.StreamHandler()
                         ])
+    ui = UI()
     ir = IRacing()
     audio_AI = AudioAI()
     text_AI = TextAI()
-    ui = UI()
     MainPresenter(ui, audio_AI, text_AI, ir)
