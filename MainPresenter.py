@@ -1,15 +1,12 @@
 import asyncio
 import logging
 import os
-import sys
 import threading
 import re
 import pygame
 from dotenv import get_key
-
 from AudioAI import AudioAI
 from IRacing import IRacing
-from IRacingError import IRacingError
 from TextAI import TextAI
 from UI import UI
 
@@ -43,7 +40,7 @@ class MainPresenter:
         logging.info("MainPresenter initialized")
 
     @staticmethod
-    def __delete_file_if_exists(filename:str) -> None:
+    def __delete_file_if_exists(filename: str) -> None:
         """
         FR : Méthode permettant de supprimer un fichier s'il existe\n
         EN : Method to delete a file if it exists
@@ -165,13 +162,13 @@ class MainPresenter:
                 EN : Index of the game device
             """
         logging.info("Application launched")
-        try :
+        try:
             pygame.init()
             pygame.joystick.init()
             joystick = pygame.joystick.Joystick(idx)
             joystick.init()
-            self.__audio_AI.play_welcome_sound()
             self.__ir.connect()
+            self.__audio_AI.play_welcome_sound()
             logging.info("Application connected to iRacing")
             is_recording = False
             recording_data = []
