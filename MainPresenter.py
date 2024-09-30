@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import signal
 import sys
 import threading
 import re
@@ -32,6 +33,10 @@ class MainPresenter:
         """
         self.__lock_file = "smartpit.lock"
         self.__create_lock_file()
+        signal.signal(signal.SIGINT, self.__stop_application(None))
+        signal.signal(signal.SIGTERM, self.__stop_application(None))
+        if os.name == 'nt':  # Pour Windows
+            signal.signal(signal.SIGBREAK, self.__stop_application(None))
         self.devices = self.__get_ordered_devices()
         self.__ui = ui
         self.__audio_AI = audio_AI
@@ -89,7 +94,7 @@ class MainPresenter:
             devices.remove(selected_device)
             devices.insert(0, selected_device)
 
-    def __stop_application(self, error: str) -> None:
+    def __stop_application(self, error) -> None:
         """
         FR : Méthode permettant d'arrêter l'application\n
         EN : Method to stop the application
@@ -97,11 +102,16 @@ class MainPresenter:
             FR : Message d'erreur\n
             EN : Error message
         """
-        self.__ui.show_error_shutdown(error)
+        if error:
+            self.__ui.show_error_shutdown(error)
         self.__delete_file_if_exists(self.__lock_file)
         sys.exit()
 
-    def __create_lock_file(self):
+    def __create_lock_file(self) -> None:
+        """
+        FR : Méthode permettant de créer un fichier de verrouillage\n
+        EN : Method to create a lock file
+        """
         if os.path.exists(self.__lock_file):
             self.__stop_application("Application already running")
         else:
