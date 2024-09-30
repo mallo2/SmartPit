@@ -32,20 +32,16 @@ class MainPresenter:
             EN : Object allowing to communicate with iRacing
         """
         self.__lock_file = "smartpit.lock"
-        self.__create_lock_file()
-        signal.signal(signal.SIGINT, self.__stop_application(None))
-        signal.signal(signal.SIGTERM, self.__stop_application(None))
-        if os.name == 'nt':  # Pour Windows
-            signal.signal(signal.SIGBREAK, self.__stop_application(None))
         self.devices = self.__get_ordered_devices()
         self.__ui = ui
+        self.__ui.protocol("WM_DELETE_WINDOW", lambda: self.__stop_application(None))
+        self.__create_lock_file()
         self.__audio_AI = audio_AI
         self.__text_AI = text_AI
         self.__ir = ir
-
         self.__ui.set_presenter(self)
-        self.__ui.mainloop()
         logging.info("MainPresenter initialized")
+        self.__ui.mainloop()
 
     @staticmethod
     def __delete_file_if_exists(filename: str) -> None:

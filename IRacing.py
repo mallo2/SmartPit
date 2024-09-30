@@ -1,5 +1,4 @@
 import logging
-
 import irsdk
 from asyncio import sleep
 from Converter import DataConverter
