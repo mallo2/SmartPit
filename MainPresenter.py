@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-import signal
 import sys
 import threading
 import re
@@ -11,6 +10,9 @@ from AudioAI import AudioAI
 from IRacing import IRacing
 from TextAI import TextAI
 from UI import UI
+
+
+
 
 
 class MainPresenter:
@@ -31,17 +33,24 @@ class MainPresenter:
             FR : Objet permettant de communiquer avec iRacing\n
             EN : Object allowing to communicate with iRacing
         """
+        self.__selected_device = get_key('.env', 'SELECTED_DEVICE')
+        self.__path_file_record = get_key('.env', 'PATH_FILE_RECORD')
+        self.__path_file_response = get_key('.env', 'PATH_FILE_RESPONSE')
+
         self.__lock_file = "smartpit.lock"
         self.devices = self.__get_ordered_devices()
         self.__ui = ui
         self.__ui.protocol("WM_DELETE_WINDOW", lambda: self.__stop_application(None))
         self.__create_lock_file()
+
         self.__audio_AI = audio_AI
         self.__text_AI = text_AI
         self.__ir = ir
+
         self.__ui.set_presenter(self)
         logging.info("MainPresenter initialized")
         self.__ui.mainloop()
+
 
     @staticmethod
     def __delete_file_if_exists(filename: str) -> None:
@@ -76,8 +85,7 @@ class MainPresenter:
             names.append(f"{joystick.get_name()} ({joystick.get_numbuttons()})")
         return names
 
-    @staticmethod
-    def __change_order_devices(devices: list[str]) -> None:
+    def __change_order_devices(self, devices: list[str]) -> None:
         """
         FR : Méthode permettant de changer l'ordre des devices en placant le périphérique sélectionné en premier\n
         EN : Method to change the order of the devices by placing the selected device first
@@ -85,10 +93,18 @@ class MainPresenter:
             FR : Liste des périphériques de jeu\n
             EN : List of game devices
         """
-        selected_device = get_key('.env', 'SELECTED_DEVICE')
-        if selected_device and selected_device != "" and selected_device in devices:
-            devices.remove(selected_device)
-            devices.insert(0, selected_device)
+        if self.__selected_device and self.__selected_device != "" and self.__selected_device in devices:
+            devices.remove(self.__selected_device)
+            devices.insert(0, self.__selected_device)
+
+    def __update_env_key(self) -> None:
+        """
+        FR : Méthode permettant de mettre à jour les attributs sur base des clés de l'environnement\n
+        EN : Method to update the attributes based on the environment keys
+        """
+        self.__main_button = get_key('.env', 'MAIN_BUTTON')
+        self.__second_button = get_key('.env', 'SECOND_BUTTON')
+        self.__text_AI.update_groq_api_key()
 
     def __stop_application(self, error) -> None:
         """
@@ -147,7 +163,7 @@ class MainPresenter:
         match = re.match(r"(\w+)\((.*)\)", function)
 
         if try_count >= 3:
-            self.__delete_file_if_exists(get_key('.env', 'PATH_FILE_RECORD'))
+            self.__delete_file_if_exists(self.__path_file_record)
             return {
                 "question": question,
                 "response": "Je n'ai pas compris votre demande"
@@ -162,7 +178,7 @@ class MainPresenter:
                 logging.info(f"Data : {data_result}")
                 if data_result is None:
                     data_result = "Commande exécutée avec succès"
-                self.__delete_file_if_exists(get_key('.env', 'PATH_FILE_RECORD'))
+                self.__delete_file_if_exists(self.__path_file_record)
                 return {
                     "question": question,
                     "response": data_result
@@ -170,7 +186,7 @@ class MainPresenter:
 
             arg_values = [eval(arg.strip()) for arg in args.split(',')]
             data_result = method(*arg_values)
-            self.__delete_file_if_exists(get_key('.env', 'PATH_FILE_RECORD'))
+            self.__delete_file_if_exists(self.__path_file_record)
             return {
                 "question": question,
                 "response": data_result
@@ -181,7 +197,7 @@ class MainPresenter:
             logging.warning("Invalid string format")
             return self.__process(try_count=try_count)
 
-    def launch_application(self, idx):
+    def launch_application(self, idx) -> None:
         """
             FR : Méthode permettant de lancer l'application\n
             EN : Method to launch the application
@@ -190,6 +206,7 @@ class MainPresenter:
                 EN : Index of the game device
             """
         logging.info("Application launched")
+        self.__update_env_key()
         try:
             pygame.init()
             pygame.joystick.init()
@@ -202,15 +219,13 @@ class MainPresenter:
             recording_data = []
             while True:
                 for event in pygame.event.get():
-                    if event.type == pygame.JOYBUTTONDOWN and event.button == int(
-                            get_key('.env', 'MAIN_BUTTON')) and not is_recording:
+                    if event.type == pygame.JOYBUTTONDOWN and event.button == int(self.__main_button) and not is_recording:
                         logging.info("Recording started")
-                        self.__delete_file_if_exists(get_key('.env', 'PATH_FILE_RESPONSE'))
+                        self.__delete_file_if_exists(self.__path_file_response)
                         recording_data = []
                         stream = self.__audio_AI.record_audio(recording_data)
                         is_recording = True
-                    elif event.type == pygame.JOYBUTTONUP and event.button == int(
-                            get_key('.env', 'MAIN_BUTTON')) and is_recording:
+                    elif event.type == pygame.JOYBUTTONUP and event.button == int(self.__main_button) and is_recording:
                         logging.info("Recording stopped")
                         stream.stop()
                         stream.close()
@@ -224,7 +239,7 @@ class MainPresenter:
                         logging.info(f"Réponse IA : {response}")
                         asyncio.run(self.__audio_AI.play_audio(response))
                         logging.info("Audio played")
-                    elif event.type == pygame.JOYBUTTONDOWN and event.button == get_key('.env', 'SECOND_BUTTON'):
+                    elif event.type == pygame.JOYBUTTONDOWN and event.button == self.__second_button:
                         threading.Thread(target=self.__ir.thread_fuel_consumption).start()
 
                     pygame.time.wait(10)

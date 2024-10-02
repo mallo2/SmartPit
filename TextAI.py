@@ -1,5 +1,4 @@
 import logging
-
 from dotenv import get_key
 from groq import Groq
 
@@ -15,8 +14,20 @@ class TextAI:
         FR : Constructeur de la classe TextAI\n
         EN : Constructor of the TextAI class
         """
-        self.__model = Groq(api_key=get_key('.env', 'GROQ_API_KEY'))
+        self.__groq_api_key = get_key('.env', 'GROQ_API_KEY')
+        self.__groq_model_request = get_key('.env', 'GROQ_MODEL_REQUEST')
+        self.__groq_model_response = get_key('.env', 'GROQ_MODEL_RESPONSE')
+        self.__prompt_request = get_key('.env', 'PROMPT_REQUEST')
+        self.__prompt_response = get_key('.env', 'PROMPT_RESPONSE')
+        self.__groq = Groq(api_key=self.__groq_api_key)
         logging.info("TextAI initialized")
+
+    def update_groq_api_key(self) -> None:
+        """
+        FR : Méthode permettant de mettre à jour la clé API de Groq\n
+        EN : Method to update the Groq API key
+        """
+        self.__groq.api_key = get_key('.env', 'GROQ_API_KEY')
 
     def process_request(self, request: str) -> dict:
         """
@@ -29,12 +40,12 @@ class TextAI:
             FR : Réponse de l'IA
             EN : AI response
         """
-        chat_completion = self.__model.chat.completions.create(
+        chat_completion = self.__groq.chat.completions.create(
             messages=[
-                {"role": "system", "content": get_key('.env', 'PROMPT_REQUEST')},
+                {"role": "system", "content": self.__prompt_request},
                 {"role": "user", "content": request}
             ],
-            model=get_key('.env', 'GROQ_MODEL_REQUEST'),
+            model=self.__groq_model_request,
             temperature=0.2
         )
         response = chat_completion.choices[0].message.content
@@ -57,12 +68,13 @@ class TextAI:
             FR : Réponse de l'IA
             EN : AI response
         """
-        chat_completion = self.__model.chat.completions.create(
+        chat_completion = self.__groq.chat.completions.create(
             messages=[
-                {"role": "system", "content": get_key('.env', 'PROMPT_RESPONSE')},
+                {"role": "system", "content": self.__prompt_response},
                 {"role": "user", "content": f"Question : {question}. Données de course : {data}"}
             ],
-            model=get_key('.env', 'GROQ_MODEL_RESPONSE'),
+            model=self.__groq_model_response,
             temperature=0.5
         )
         return chat_completion.choices[0].message.content
+

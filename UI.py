@@ -7,7 +7,7 @@ from dotenv import set_key, get_key
 from customtkinter import CTk
 from tkinter import messagebox
 from pystray import Icon, MenuItem, Menu
-from PIL import Image, ImageDraw
+from PIL import Image
 import threading
 
 
