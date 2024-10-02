@@ -1,5 +1,5 @@
 
-![Logo](https://github.com/mallo2/SmartPit/blob/master/ressources/images/logo.jpg?raw=true)
+![Logo](https://github.com/mallo2/SmartPit/blob/master/ressources/images/logo-small.jpg?raw=true)
 
 # SmartPit
 
