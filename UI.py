@@ -19,6 +19,9 @@ class UI(CTk):
         """
         super().__init__()
         threading.Thread(target=self.__setup_tray, daemon=True).start()
+        self.__main_button = get_key('.env', 'MAIN_BUTTON')
+        self.__second_button = get_key('.env', 'SECOND_BUTTON')
+        self.__groq_api_key = get_key('.env', 'GROQ_API_KEY')
         self.__original_devices = None
         self.__devices = None
         self.__presenter = None
@@ -27,10 +30,8 @@ class UI(CTk):
         self.__create_image()
         self.__textbox = self.__create_textbox()
         self.__dropdown = self.__create_dropdown()
-        self.__main_button = self.__create_button_textbox_frame("Assigner la touche principale",
-                                                                get_key('.env', 'MAIN_BUTTON'))
-        self.__second_button = self.__create_button_textbox_frame("Assigner la touche secondaire",
-                                                                  get_key('.env', 'SECOND_BUTTON'))
+        self.__main_button = self.__create_button_textbox_frame("Assigner la touche principale", self.__main_button)
+        self.__second_button = self.__create_button_textbox_frame("Assigner la touche secondaire", self.__second_button)
         self.__create_button()
         self.__alert = self.__create_alert()
         logging.info("UI initialized")
@@ -54,19 +55,6 @@ class UI(CTk):
         return mainWindow
 
     @staticmethod
-    def __init_textbox(textbox: CTkEntry) -> None:
-        """
-        FR : Méthode permettant d'initialiser le textbox pour la clé d'API de Groq\n
-        EN : Method to initialize the textbox for the Groq API key
-        :param textbox: (CTkEntry)
-            FR : Textbox pour la clé d'API de Groq
-            EN : Textbox for the Groq API key
-        """
-        groq_api_key = get_key('.env', 'GROQ_API_KEY')
-        if groq_api_key and groq_api_key != "":
-            textbox.insert(0, groq_api_key)
-
-    @staticmethod
     def __update_env_file(api_key: str, selected_device: str, main_button: str, second_button: str) -> None:
         """
         FR : Méthode privée permettant de mettre à jour le fichier .env après la validation de la pague d'acceuil\n
@@ -88,6 +76,17 @@ class UI(CTk):
         set_key('.env', 'SELECTED_DEVICE', selected_device)
         set_key('.env', 'MAIN_BUTTON', main_button)
         set_key('.env', 'SECOND_BUTTON', second_button)
+
+    def __init_textbox(self, textbox: CTkEntry) -> None:
+        """
+        FR : Méthode permettant d'initialiser le textbox pour la clé d'API de Groq\n
+        EN : Method to initialize the textbox for the Groq API key
+        :param textbox: (CTkEntry)
+            FR : Textbox pour la clé d'API de Groq
+            EN : Textbox for the Groq API key
+        """
+        if self.__groq_api_key and self.__groq_api_key != "":
+            textbox.insert(0, self.__groq_api_key)
 
     def __set_dropdown(self, devices: list[str]) -> None:
         """
