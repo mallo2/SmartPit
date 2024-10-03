@@ -12,9 +12,6 @@ from TextAI import TextAI
 from UI import UI
 
 
-
-
-
 class MainPresenter:
     def __init__(self, ui: UI, audio_AI: AudioAI, text_AI: TextAI, ir: IRacing):
         """
@@ -40,7 +37,7 @@ class MainPresenter:
         self.__lock_file = "smartpit.lock"
         self.devices = self.__get_ordered_devices()
         self.__ui = ui
-        self.__ui.protocol("WM_DELETE_WINDOW", lambda: self.__stop_application(None))
+        self.__ui.protocol("WM_DELETE_WINDOW", lambda: self.stop_application(None))
         self.__create_lock_file()
 
         self.__audio_AI = audio_AI
@@ -50,7 +47,6 @@ class MainPresenter:
         self.__ui.set_presenter(self)
         logging.info("MainPresenter initialized")
         self.__ui.mainloop()
-
 
     @staticmethod
     def __delete_file_if_exists(filename: str) -> None:
@@ -106,26 +102,13 @@ class MainPresenter:
         self.__second_button = get_key('.env', 'SECOND_BUTTON')
         self.__text_AI.update_groq_api_key()
 
-    def __stop_application(self, error) -> None:
-        """
-        FR : Méthode permettant d'arrêter l'application\n
-        EN : Method to stop the application
-        :param error: (str)
-            FR : Message d'erreur\n
-            EN : Error message
-        """
-        if error:
-            self.__ui.show_error_shutdown(error)
-        self.__delete_file_if_exists(self.__lock_file)
-        sys.exit()
-
     def __create_lock_file(self) -> None:
         """
         FR : Méthode permettant de créer un fichier de verrouillage\n
         EN : Method to create a lock file
         """
         if os.path.exists(self.__lock_file):
-            self.__stop_application("Application already running")
+            self.stop_application("Application already running")
         else:
             with open(self.__lock_file, 'w') as lock_file:
                 lock_file.write(str(os.getpid()))
@@ -197,6 +180,19 @@ class MainPresenter:
             logging.warning("Invalid string format")
             return self.__process(try_count=try_count)
 
+    def stop_application(self, error) -> None:
+        """
+        FR : Méthode permettant d'arrêter l'application\n
+        EN : Method to stop the application
+        :param error: (str)
+            FR : Message d'erreur\n
+            EN : Error message
+        """
+        if error:
+            self.__ui.show_error_shutdown(error)
+        self.__delete_file_if_exists(self.__lock_file)
+        sys.exit()
+
     def launch_application(self, idx) -> None:
         """
             FR : Méthode permettant de lancer l'application\n
@@ -219,7 +215,8 @@ class MainPresenter:
             recording_data = []
             while True:
                 for event in pygame.event.get():
-                    if event.type == pygame.JOYBUTTONDOWN and event.button == int(self.__main_button) and not is_recording:
+                    if event.type == pygame.JOYBUTTONDOWN and event.button == int(
+                            self.__main_button) and not is_recording:
                         logging.info("Recording started")
                         self.__delete_file_if_exists(self.__path_file_response)
                         recording_data = []
@@ -241,7 +238,6 @@ class MainPresenter:
                         logging.info("Audio played")
                     elif event.type == pygame.JOYBUTTONDOWN and event.button == self.__second_button:
                         threading.Thread(target=self.__ir.thread_fuel_consumption).start()
-
                     pygame.time.wait(10)
         except Exception as e:
-            self.__stop_application(str(e))
+            self.stop_application(str(e))

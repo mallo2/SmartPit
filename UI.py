@@ -291,17 +291,20 @@ class UI(CTk):
         logging.critical(error)
         messagebox.showerror("Erreur d'exécution", error)
 
-    @staticmethod
-    def __quit_app(icon) -> None:
+
+    def __quit_app(self ,icon) -> None:
         """
-        FR : Méthode statique permettant de quitter l'application\n
-        EN : Static method to quit the application
+        FR : Méthode permettant de quitter l'application\n
+        EN :  method to quit the application
         :param icon: (Icon)
             FR : Icône de l'application
             EN : Application icon
         """
-        logging.info("Application closed")
         icon.stop()
+        logging.info("Application stopped")
+        self.__presenter.stop_application(None)
+
+
 
     def __setup_tray(self) -> None:
         """
