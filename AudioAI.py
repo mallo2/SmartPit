@@ -47,10 +47,9 @@ class AudioAI:
         def __callback(indata, _frames, _time, _status):
             recording_data.append(indata.copy())
 
-        with sd.InputStream(callback=__callback, channels=1, samplerate=sample_rate) as stream:
-            stream.start()
-            return stream
-
+        stream = sd.InputStream(callback=__callback, channels=1, samplerate=sample_rate)
+        stream.start()
+        return stream
 
     def play_welcome_sound(self) -> None:
         """
@@ -60,7 +59,6 @@ class AudioAI:
         pygame.mixer.init()
         pygame.mixer.music.load(self.__path_file_welcome)
         pygame.mixer.music.play()
-
 
     async def play_audio(self, message: str) -> None:
         """

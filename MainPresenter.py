@@ -149,7 +149,7 @@ class MainPresenter:
             self.__delete_file_if_exists(self.__path_file_record)
             return {
                 "question": question,
-                "response": "Je n'ai pas compris votre demande"
+                "response": "Aucune donnée, demande non comprise"
             }
 
         if match:
@@ -213,6 +213,7 @@ class MainPresenter:
             logging.info("Application connected to iRacing")
             is_recording = False
             recording_data = []
+            stream = None
             while True:
                 for event in pygame.event.get():
                     if event.type == pygame.JOYBUTTONDOWN and event.button == int(

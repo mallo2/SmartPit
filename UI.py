@@ -291,8 +291,7 @@ class UI(CTk):
         logging.critical(error)
         messagebox.showerror("Erreur d'exécution", error)
 
-
-    def __quit_app(self ,icon) -> None:
+    def __quit_app(self, icon) -> None:
         """
         FR : Méthode permettant de quitter l'application\n
         EN :  method to quit the application
@@ -303,8 +302,6 @@ class UI(CTk):
         icon.stop()
         logging.info("Application stopped")
         self.__presenter.stop_application(None)
-
-
 
     def __setup_tray(self) -> None:
         """

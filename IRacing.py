@@ -184,7 +184,7 @@ class IRacing:
             EN : Total number of laps of the race
         """
         if self.__is_race_mesured_laps():
-            return  f"Nombre de tours total: {DataConverter.int_to_laps_number(self.__ir['SessionLapsTotal'])}"
+            return f"Nombre de tours total: {DataConverter.int_to_laps_number(self.__ir['SessionLapsTotal'])}"
         else:
             return self.duration_race()
 
@@ -510,11 +510,11 @@ class IRacing:
 
     def temperature_of_front_right_tire(self) -> str:
         """
-        FR : Méthode permettant de récupérer la température du pneu avant droit\n
-        EN : Method to get the temperature of the front right tire
+        FR : Méthode permettant de récupérer la température du pneu avant droit\n EN : Method to get the temperature
+        of the front right tire
         :return: (str)
-            FR : Température moyenne du pneu avant droit en degrés Celsius à partir du flanc gauche, central et droit.
-            EN : The average temperature of the front right tire in Celsius degrees from the left, middle, and right carcass.
+        FR : Température moyenne du pneu avant droit en degrés Celsius à partir du flanc gauche, central et droit.
+        EN : The average temperature of the front right tire in Celsius degrees from the left, middle, and right carcass.
         """
         return f"Température moyenne du pneu avant droit: {DataConverter.float_to_celsius_degrees((self.__ir['RFtempCL'] + self.__ir['RFtempCM'] + self.__ir['RFtempCR']) / 3)}"
 

@@ -15,8 +15,7 @@ class TextAI:
         EN : Constructor of the TextAI class
         """
         self.__groq_api_key = get_key('.env', 'GROQ_API_KEY')
-        self.__groq_model_request = get_key('.env', 'GROQ_MODEL_REQUEST')
-        self.__groq_model_response = get_key('.env', 'GROQ_MODEL_RESPONSE')
+        self.__groq_model = get_key('.env', 'GROQ_MODEL')
         self.__prompt_request = get_key('.env', 'PROMPT_REQUEST')
         self.__prompt_response = get_key('.env', 'PROMPT_RESPONSE')
         self.__groq = Groq(api_key=self.__groq_api_key)
@@ -45,7 +44,7 @@ class TextAI:
                 {"role": "system", "content": self.__prompt_request},
                 {"role": "user", "content": request}
             ],
-            model=self.__groq_model_request,
+            model=self.__groq_model,
             temperature=0.2
         )
         response = chat_completion.choices[0].message.content
@@ -73,8 +72,7 @@ class TextAI:
                 {"role": "system", "content": self.__prompt_response},
                 {"role": "user", "content": f"Question : {question}. Données de course : {data}"}
             ],
-            model=self.__groq_model_response,
+            model=self.__groq_model,
             temperature=0.5
         )
         return chat_completion.choices[0].message.content
-
